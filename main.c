@@ -1,0 +1,214 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <malloc.h>
+#include <getopt.h>
+
+#include <SDL2/SDL.h>
+
+#define HEX_R(x) ((x & 0xFF0000) >> 16)
+#define HEX_G(x) ((x & 0x00FF00) >> 8)
+#define HEX_B(x) ((x & 0x0000FF))
+
+void parse_arguments (int argc, char **argv);
+void start_ruler (unsigned width, unsigned height, unsigned hex_color);
+void print_help (FILE *pipe, int exit_code);
+void print_version (FILE *pipe, int exit_code);
+
+/* default values */
+unsigned g_width  = 500;
+unsigned g_height = 50;
+unsigned g_hex    = 0x000000;
+
+int
+main (int argc, char **argv)
+{
+    parse_arguments (argc, argv);
+    start_ruler (g_width, g_height, g_hex);
+    exit (EXIT_SUCCESS);
+}
+
+
+int 
+valid_hexstr (const char *str)
+{
+    char *iter = (char *)str;
+
+    if (iter[0] != '0' || iter[1] != 'x')
+        return 0;
+
+    iter += 2;
+
+    while (*iter != '\0')
+    {
+        if (!isxdigit (*iter))
+            return 0;
+
+        iter++;
+    }
+
+    return 1;
+}
+
+
+void
+parse_arguments (int argc, char **argv)
+{
+    int ret;
+    int c;
+    struct option long_options[] =
+    {
+    /*   NAME       ARGUEMENT          FLAG        SHORTNAME */
+        {"color",   required_argument, NULL,       'c'},
+        {"colour",  required_argument, NULL,       'c'},
+        {"width",   required_argument, NULL,       'W'},
+        {"height",  required_argument, NULL,       'H'},
+        {"help",    no_argument,       NULL,       'h'},
+        {"version", no_argument,       NULL,       'V'},
+        {NULL,      0,                 NULL,       0},
+    };
+    int option_index = 0;
+
+    while ((c = getopt_long (argc, argv, "c:W:H:hV",
+                             long_options, &option_index)) != -1)
+    {
+        switch (c)
+        {
+        case 'c':
+            if (!valid_hexstr (optarg))
+                print_help (stderr, EXIT_FAILURE);
+            sscanf (optarg, "%x", &g_hex);
+            break;
+        case 'W':
+            sscanf (optarg, "%u", &g_width);
+            break;
+        case 'H':
+            sscanf (optarg, "%u", &g_height);
+            break;
+        case 'V':
+            print_version (stdout, EXIT_SUCCESS);
+        case 'h':
+            print_help (stdout, EXIT_SUCCESS);
+        default:
+            print_help (stderr, EXIT_FAILURE);
+        }
+    }
+
+    return;
+}
+
+
+void
+start_ruler (unsigned width, unsigned height, unsigned hex_color)
+{
+    SDL_Window *win;
+    SDL_Renderer *rend;
+    SDL_Event e;
+    SDL_Keysym *key; 
+
+    (void)SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS);
+
+    (void)SDL_CreateWindowAndRenderer (
+            width, height, 
+            SDL_WINDOW_BORDERLESS | SDL_WINDOW_RESIZABLE | SDL_WINDOW_SKIP_TASKBAR,
+            &win, &rend);
+    
+    SDL_RenderSetVSync (rend, 1);
+    SDL_SetRenderDrawColor (
+            rend, 
+            HEX_R (hex_color),
+            HEX_G (hex_color),
+            HEX_B (hex_color),
+            SDL_ALPHA_OPAQUE);
+   
+    while (1)
+    {
+        while (SDL_PollEvent (&e))
+        {
+            switch (e.type)
+            {
+            case SDL_KEYDOWN:
+                key = &(e.key.keysym);
+
+                if ((key->sym == SDLK_q) && ((key->mod & KMOD_CTRL) != 0))
+                    goto quit;
+                else if (key->sym == SDLK_ESCAPE)
+                    goto quit;
+
+                break;
+
+            case SDL_QUIT:
+                goto quit;
+            }
+        }
+        
+        SDL_RenderClear (rend);
+        SDL_RenderPresent (rend);
+    }
+
+quit:
+    SDL_DestroyRenderer (rend);
+    SDL_DestroyWindow (win);
+    
+    SDL_Quit ();
+
+    return;
+}
+
+
+void
+print_help (FILE *pipe, int exit_code)
+{
+    (void)fprintf (pipe,
+        "Usage: ruler [OPTIONS]\n"
+        "Example: ruler -c 0xFF00FF -W 1024 -H 100    1024x100px Magenta ruler\n"
+        "         ruler -color 0x333333               500x50px Grey ruler\n"
+        "         ruler                               500x50px Black ruler\n"
+        "Draws a basic single color ruler to the screen. If no -cWH flags are given\n"
+        "use default values of 500x50px and 0x000000 color.\n"
+        "\n"
+        "Mandatory arguments to long options are mandatory for short options too.\n"
+        "  -c, --color=HEX     in hex format (0x000000) set the ruler's color\n"
+        "  -W, --width=PIXEL   in pixels set the ruler's initial width\n"
+        "  -H, --height=PIXEL  in pixels set the ruler's initial height\n"
+        "\n"
+        "  -h, --help          show this screen and exit\n"
+        "  -V, --version       output version details and exit\n"
+        "\n"
+        "the PIXEL argument is a positive integer, any floating point numbers\n"
+        "are floored.\n"
+        "\n"
+        "the HEX argument is a hexadecimal colour in C hex formatting. it accepts\n"
+        "values from 0x000000 to 0xFFFFFF\n"
+        "\n"
+        "Keyboard Shortcuts:\n"
+        "  Ctrl+q   quit\n"
+        "  Escape   quit\n"
+        "\n"
+        "Exit status:\n"
+        " 0  if OK,\n"
+        " 1  if error\n"
+        "\n"
+        "For bug reporting and help reach out to <sage.message@email.com>\n"
+        "or file an issue at <github.com/sage-etcher/ruler.git>\n");
+
+    exit (exit_code);
+}
+
+
+void
+print_version (FILE *pipe, int exit_code)
+{
+    (void)fprintf (pipe, 
+        "ruler 1.0\n"
+        "Copyright (C) 2024 Sage I. Hendricks\n"
+        "Source: <https://github.com/sage-etcher/ruler.git>\n"
+        "License MIT: The MIT License, <https://spdx.org/licenses/MIT.html>\n"
+        "This is free software: you are free to change and redistribute it.\n"
+        "There is NO WARRANTY, to the extent permitted by law.\n");
+
+    exit (exit_code);
+}
+
+
+
+
