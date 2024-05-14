@@ -112,33 +112,43 @@ parse_arguments (int argc, char **argv)
     /*}}}*/
 }
 
+struct display_data
+{
+    SDL_Window *win;
+    SDL_Renderer *rend;
+    SDL_bool resize_flag;
+};
 
 void
 start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity)
 {
     /*{{{*/
     const char *TITLE= "Ruler";
-    SDL_Window *win;
-    SDL_Renderer *rend;
     SDL_Event e;
     SDL_Keysym *key; 
 
-    SDL_bool resize_flag = SDL_TRUE;
+    struct display_data data;
+    SDL_Window *win;
+    SDL_Renderer *rend;
+
+    data.resize_flag = SDL_TRUE;
 
     (void)SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS);
 
     (void)SDL_CreateWindowAndRenderer (
             width, height, 
             SDL_WINDOW_BORDERLESS | SDL_WINDOW_SKIP_TASKBAR,
-            &win, &rend);
+            &(data.win), &(data.rend));
+    win = data.win;
+    rend = data.rend;
  
-    SDL_SetWindowResizable (win, resize_flag);
+    SDL_SetWindowResizable (win, data.resize_flag);
     SDL_SetWindowTitle (win, TITLE);
     SDL_SetWindowAlwaysOnTop (win, SDL_TRUE);
     SDL_SetWindowOpacity (win, opacity);
     SDL_SetWindowMinimumSize (win, WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT);
 
-    SDL_SetWindowHitTest (win, callback_always_move_window, &resize_flag);
+    SDL_SetWindowHitTest (win, callback_always_move_window, &data);
 
     SDL_RenderSetVSync (rend, 1);
     SDL_SetRenderDrawColor (
@@ -163,8 +173,8 @@ start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity)
                     goto quit;
                 else if ((key->sym == SDLK_l) && ((key->mod & KMOD_CTRL) != 0))
                 {
-                    resize_flag = (resize_flag ? SDL_FALSE : SDL_TRUE);
-                    SDL_SetWindowResizable(win, resize_flag);
+                    data.resize_flag = (data.resize_flag ? SDL_FALSE : SDL_TRUE);
+                    SDL_SetWindowResizable(win, data.resize_flag);
                 }
 
                 break;
@@ -282,19 +292,23 @@ resize_window (SDL_Window *win, const SDL_Point *area, SDL_HitTestResult *p_ret)
 
 
 SDL_HitTestResult
-callback_always_move_window (SDL_Window *win, const SDL_Point *area, void *data)
+callback_always_move_window (SDL_Window *win, const SDL_Point *area, void *void_data)
 {
     /*{{{*/
-    const SDL_bool resizeable_flag = *(SDL_bool *)data;
+    struct display_data *data = void_data;
     SDL_HitTestResult result;
 
     /* make the whole winodw draggable if the resize flag is disabled */
-    if (resizeable_flag == SDL_FALSE)
+    if (data->resize_flag == SDL_FALSE)
         return SDL_HITTEST_DRAGGABLE;
 
     /* if the cursor is along the edge of the window, resize */
     if (resize_window (win, area, &result) == SDL_TRUE)
+    {
+        SDL_RenderClear (data->rend);
+        SDL_RenderPresent (data->rend);
         return result;
+    }
 
     /* otherwise move the window */
     return SDL_HITTEST_DRAGGABLE;
