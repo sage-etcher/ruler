@@ -24,6 +24,7 @@ unsigned g_width   = 500;
 unsigned g_height  = 50;
 unsigned g_hex     = 0x333333;
 
+
 int
 main (int argc, char **argv)
 {
@@ -122,19 +123,22 @@ start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity)
     SDL_Event e;
     SDL_Keysym *key; 
 
+    SDL_bool resize_flag = SDL_TRUE;
+
     (void)SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS);
 
     (void)SDL_CreateWindowAndRenderer (
             width, height, 
-            SDL_WINDOW_BORDERLESS | SDL_WINDOW_RESIZABLE | SDL_WINDOW_SKIP_TASKBAR,
+            SDL_WINDOW_BORDERLESS | SDL_WINDOW_SKIP_TASKBAR,
             &win, &rend);
-  
+ 
+    SDL_SetWindowResizable (win, resize_flag);
     SDL_SetWindowTitle (win, TITLE);
     SDL_SetWindowAlwaysOnTop (win, SDL_TRUE);
     SDL_SetWindowOpacity (win, opacity);
     SDL_SetWindowMinimumSize (win, WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT);
 
-    SDL_SetWindowHitTest (win, callback_always_move_window, NULL);
+    SDL_SetWindowHitTest (win, callback_always_move_window, &resize_flag);
 
     SDL_RenderSetVSync (rend, 1);
     SDL_SetRenderDrawColor (
@@ -157,6 +161,11 @@ start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity)
                     goto quit;
                 else if (key->sym == SDLK_ESCAPE)
                     goto quit;
+                else if ((key->sym == SDLK_l) && ((key->mod & KMOD_CTRL) != 0))
+                {
+                    resize_flag = (resize_flag ? SDL_FALSE : SDL_TRUE);
+                    SDL_SetWindowResizable(win, resize_flag);
+                }
 
                 break;
 
@@ -180,11 +189,122 @@ quit:
 }
 
 
+/* only relevent to resize_window() */
+/*{{{*/
+#define QUICKDIST(_x,_y) ((_x*_x)+(_y*_y))
+
+#define RESIZESIDE(_c,_d,_r) \
+if (_c) { \
+    dist = _d; \
+    if (!resize_flag || dist <= closest_dist) { \
+        resize_flag = 1; \
+        closest_dist = dist; \
+        closest_result = _r; \
+    } \
+} \
+
+#define RESIZECORNER(_c,_x,_y,_r) RESIZESIDE(_c, QUICKDIST(_x,_y), _r)
+/*}}}*/
+
+
+SDL_bool
+resize_window (SDL_Window *win, const SDL_Point *area, SDL_HitTestResult *p_ret)
+{
+    /*{{{*/
+    const int RESIZE_DIST = 20;
+    int resize_flag = 0;
+    long closest_dist = 0, dist;
+    SDL_HitTestResult closest_result;
+
+    int x = area->x; 
+    int y = area->y;
+
+    int margin_top, margin_bottom, margin_left, margin_right;
+    int width, height;
+
+    /* get some numbers for sizing */
+    SDL_GetWindowSize (win, &width, &height);
+
+    margin_top    = RESIZE_DIST;
+    margin_left   = RESIZE_DIST;
+    margin_bottom = height - RESIZE_DIST;
+    margin_right  = width  - RESIZE_DIST;
+
+    /* check each corner */
+    /*{{{*/
+    /* top left */
+    RESIZECORNER(((y <= margin_top) && (x <= margin_left)), 
+                 x, y, 
+                 SDL_HITTEST_RESIZE_TOPLEFT);
+    /* top right */
+    RESIZECORNER(((y <= margin_top) && (x >= margin_right)), 
+                 (width - x), y, 
+                 SDL_HITTEST_RESIZE_TOPRIGHT);
+    /* bottom right */
+    RESIZECORNER(((y >= margin_bottom) && (x >= margin_right)), 
+                 (width - x), (height - y), 
+                 SDL_HITTEST_RESIZE_BOTTOMRIGHT);
+    /* bottom left */
+    RESIZECORNER(((y >= margin_bottom) && (x <= margin_left)), 
+                 x, (height - y), 
+                 SDL_HITTEST_RESIZE_BOTTOMLEFT);
+   
+    if (resize_flag)
+    {
+        *p_ret = closest_result;
+        return SDL_TRUE;
+    }
+    /*}}}*/
+
+    /* check each side */
+    /*{{{*/
+    /* top */
+    RESIZESIDE((y <= margin_top),
+               y, 
+               SDL_HITTEST_RESIZE_TOP);
+    /* bottom */
+    RESIZESIDE((y >= margin_bottom),
+               (height - y), 
+               SDL_HITTEST_RESIZE_BOTTOM);
+    /* left */
+    RESIZESIDE((x <= margin_left),
+               x, 
+               SDL_HITTEST_RESIZE_LEFT);
+    /* right */
+    RESIZESIDE((x >= margin_right),
+               (width - x), 
+               SDL_HITTEST_RESIZE_RIGHT);
+
+    if (resize_flag)
+    {
+        *p_ret = closest_result;
+        return SDL_TRUE;
+    }
+    /*}}}*/
+
+    return SDL_FALSE;
+    /*}}}*/
+}
+
+
 SDL_HitTestResult
 callback_always_move_window (SDL_Window *win, const SDL_Point *area, void *data)
 {
     /*{{{*/
+    const SDL_bool resizeable_flag = *(SDL_bool *)data;
+    SDL_HitTestResult result;
+
+    /* make the whole winodw draggable if the resize flag is disabled */
+    if (resizeable_flag == SDL_FALSE)
+        return SDL_HITTEST_DRAGGABLE;
+
+    /* if the cursor is along the edge of the window, resize */
+    if (resize_window (win, area, &result) == SDL_TRUE)
+        return result;
+
+    /* otherwise move the window */
     return SDL_HITTEST_DRAGGABLE;
+
     /*}}}*/
 }
 
@@ -220,6 +340,7 @@ print_help (FILE *pipe, int exit_code)
         "Keyboard Shortcuts:\n"
         "  Ctrl+q   quit\n"
         "  Escape   quit\n"
+        "  Ctrl+l   lock size\n"
         "\n"
         "Exit status:\n"
         " 0  if OK,\n"
