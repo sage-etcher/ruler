@@ -329,7 +329,9 @@ print_help (FILE *pipe, int exit_code)
         "are floored.\n"
         "\n"
         "the HEX argument is a hexadecimal colour in C hex formatting. it accepts\n"
-        "values from 0x000000 to 0xFFFFFF\n"
+        "values from 0x000000 to 0xFFFFFF.\n"
+        "\n"
+        "the FLOAT arguement is a 32bit float value between 0.0 and 1.0.\n"
         "\n"
         "Keyboard Shortcuts:\n"
         "  Ctrl+q   quit\n"
@@ -340,8 +342,8 @@ print_help (FILE *pipe, int exit_code)
         " 0  if OK,\n"
         " 1  if error\n"
         "\n"
-        "For bug reporting and help reach out to <sage.message@email.com>\n"
-        "or file an issue at <github.com/sage-etcher/ruler.git>\n");
+        "For bug reporting and help reach out to <sage.message@email.com>,\n"
+        "or file an issue at <https://github.com/sage-etcher/ruler.git>.\n");
 
     exit (exit_code);
     /*}}}*/
