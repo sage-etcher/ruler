@@ -191,19 +191,19 @@ quit:
 
 /* only relevent to resize_window() */
 /*{{{*/
+#define ABS(_x) ((_x < 0 ? -_x : _x))
+
 #define QUICKDIST(_x,_y) ((_x*_x)+(_y*_y))
 
-#define RESIZESIDE(_c,_d,_r) \
+#define RESIZEPOINT(_c,_x,_y,_r) \
 if (_c) { \
-    dist = _d; \
+    dist = QUICKDIST(ABS((int)(_x)),ABS((int)(_y))); \
     if (!resize_flag || dist <= closest_dist) { \
         resize_flag = 1; \
         closest_dist = dist; \
         closest_result = _r; \
     } \
 } \
-
-#define RESIZECORNER(_c,_x,_y,_r) RESIZESIDE(_c, QUICKDIST(_x,_y), _r)
 /*}}}*/
 
 
@@ -233,19 +233,19 @@ resize_window (SDL_Window *win, const SDL_Point *area, SDL_HitTestResult *p_ret)
     /* check each corner */
     /*{{{*/
     /* top left */
-    RESIZECORNER(((y <= margin_top) && (x <= margin_left)), 
+    RESIZEPOINT(((y <= margin_top) && (x <= margin_left)), 
                  x, y, 
                  SDL_HITTEST_RESIZE_TOPLEFT);
     /* top right */
-    RESIZECORNER(((y <= margin_top) && (x >= margin_right)), 
+    RESIZEPOINT(((y <= margin_top) && (x >= margin_right)), 
                  (width - x), y, 
                  SDL_HITTEST_RESIZE_TOPRIGHT);
     /* bottom right */
-    RESIZECORNER(((y >= margin_bottom) && (x >= margin_right)), 
+    RESIZEPOINT(((y >= margin_bottom) && (x >= margin_right)), 
                  (width - x), (height - y), 
                  SDL_HITTEST_RESIZE_BOTTOMRIGHT);
     /* bottom left */
-    RESIZECORNER(((y >= margin_bottom) && (x <= margin_left)), 
+    RESIZEPOINT(((y >= margin_bottom) && (x <= margin_left)), 
                  x, (height - y), 
                  SDL_HITTEST_RESIZE_BOTTOMLEFT);
     /*}}}*/
@@ -253,20 +253,20 @@ resize_window (SDL_Window *win, const SDL_Point *area, SDL_HitTestResult *p_ret)
     /* check each side */
     /*{{{*/
     /* top */
-    RESIZESIDE((y <= margin_top),
-               y, 
+    RESIZEPOINT((y <= margin_top),
+               ((width/2) - x), y,
                SDL_HITTEST_RESIZE_TOP);
     /* bottom */
-    RESIZESIDE((y >= margin_bottom),
-               (height - y), 
+    RESIZEPOINT((y >= margin_bottom),
+               ((width/2) - x), (height - y), 
                SDL_HITTEST_RESIZE_BOTTOM);
     /* left */
-    RESIZESIDE((x <= margin_left),
-               x, 
+    RESIZEPOINT((x <= margin_left),
+               x, ((height/2) - y),
                SDL_HITTEST_RESIZE_LEFT);
     /* right */
-    RESIZESIDE((x >= margin_right),
-               (width - x), 
+    RESIZEPOINT((x >= margin_right),
+               (width - x), ((height/2) - y), 
                SDL_HITTEST_RESIZE_RIGHT);
     /*}}}*/
 
