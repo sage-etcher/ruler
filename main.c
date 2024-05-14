@@ -248,12 +248,6 @@ resize_window (SDL_Window *win, const SDL_Point *area, SDL_HitTestResult *p_ret)
     RESIZECORNER(((y >= margin_bottom) && (x <= margin_left)), 
                  x, (height - y), 
                  SDL_HITTEST_RESIZE_BOTTOMLEFT);
-   
-    if (resize_flag)
-    {
-        *p_ret = closest_result;
-        return SDL_TRUE;
-    }
     /*}}}*/
 
     /* check each side */
@@ -274,13 +268,13 @@ resize_window (SDL_Window *win, const SDL_Point *area, SDL_HitTestResult *p_ret)
     RESIZESIDE((x >= margin_right),
                (width - x), 
                SDL_HITTEST_RESIZE_RIGHT);
+    /*}}}*/
 
     if (resize_flag)
     {
         *p_ret = closest_result;
         return SDL_TRUE;
     }
-    /*}}}*/
 
     return SDL_FALSE;
     /*}}}*/
