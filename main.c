@@ -10,27 +10,35 @@
 #define HEX_B(x) ((x & 0x0000FF))
 
 void parse_arguments (int argc, char **argv);
-void start_ruler (unsigned width, unsigned height, unsigned hex_color);
+void start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity);
 void print_help (FILE *pipe, int exit_code);
 void print_version (FILE *pipe, int exit_code);
 
+SDL_HitTestResult callback_always_move_window (SDL_Window *win, const SDL_Point *area, void *data);
+
 /* default values */
-unsigned g_width  = 500;
-unsigned g_height = 50;
-unsigned g_hex    = 0x000000;
+#define WINDOW_MIN_WIDTH 1
+#define WINDOW_MIN_HEIGHT 1
+float    g_opacity = 0.8f;
+unsigned g_width   = 500;
+unsigned g_height  = 50;
+unsigned g_hex     = 0x333333;
 
 int
 main (int argc, char **argv)
 {
+    /*{{{*/
     parse_arguments (argc, argv);
-    start_ruler (g_width, g_height, g_hex);
+    start_ruler (g_width, g_height, g_hex, g_opacity);
     exit (EXIT_SUCCESS);
+    /*}}}*/
 }
 
 
 int 
 valid_hexstr (const char *str)
 {
+    /*{{{*/
     char *iter = (char *)str;
 
     if (iter[0] != '0' || iter[1] != 'x')
@@ -47,12 +55,14 @@ valid_hexstr (const char *str)
     }
 
     return 1;
+    /*}}}*/
 }
 
 
 void
 parse_arguments (int argc, char **argv)
 {
+    /*{{{*/
     int ret;
     int c;
     struct option long_options[] =
@@ -60,6 +70,7 @@ parse_arguments (int argc, char **argv)
     /*   NAME       ARGUEMENT          FLAG        SHORTNAME */
         {"color",   required_argument, NULL,       'c'},
         {"colour",  required_argument, NULL,       'c'},
+        {"opacity", required_argument, NULL,       'o'},
         {"width",   required_argument, NULL,       'W'},
         {"height",  required_argument, NULL,       'H'},
         {"help",    no_argument,       NULL,       'h'},
@@ -68,7 +79,7 @@ parse_arguments (int argc, char **argv)
     };
     int option_index = 0;
 
-    while ((c = getopt_long (argc, argv, "c:W:H:hV",
+    while ((c = getopt_long (argc, argv, "c:o:W:H:hV",
                              long_options, &option_index)) != -1)
     {
         switch (c)
@@ -77,6 +88,9 @@ parse_arguments (int argc, char **argv)
             if (!valid_hexstr (optarg))
                 print_help (stderr, EXIT_FAILURE);
             sscanf (optarg, "%x", &g_hex);
+            break;
+        case 'o':
+            sscanf (optarg, "%f", &g_opacity);
             break;
         case 'W':
             sscanf (optarg, "%u", &g_width);
@@ -94,12 +108,15 @@ parse_arguments (int argc, char **argv)
     }
 
     return;
+    /*}}}*/
 }
 
 
 void
-start_ruler (unsigned width, unsigned height, unsigned hex_color)
+start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity)
 {
+    /*{{{*/
+    const char *TITLE= "Ruler";
     SDL_Window *win;
     SDL_Renderer *rend;
     SDL_Event e;
@@ -111,7 +128,14 @@ start_ruler (unsigned width, unsigned height, unsigned hex_color)
             width, height, 
             SDL_WINDOW_BORDERLESS | SDL_WINDOW_RESIZABLE | SDL_WINDOW_SKIP_TASKBAR,
             &win, &rend);
-    
+  
+    SDL_SetWindowTitle (win, TITLE);
+    SDL_SetWindowAlwaysOnTop (win, SDL_TRUE);
+    SDL_SetWindowOpacity (win, opacity);
+    SDL_SetWindowMinimumSize (win, WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT);
+
+    SDL_SetWindowHitTest (win, callback_always_move_window, NULL);
+
     SDL_RenderSetVSync (rend, 1);
     SDL_SetRenderDrawColor (
             rend, 
@@ -152,27 +176,40 @@ quit:
     SDL_Quit ();
 
     return;
+    /*}}}*/
+}
+
+
+SDL_HitTestResult
+callback_always_move_window (SDL_Window *win, const SDL_Point *area, void *data)
+{
+    /*{{{*/
+    return SDL_HITTEST_DRAGGABLE;
+    /*}}}*/
 }
 
 
 void
 print_help (FILE *pipe, int exit_code)
 {
+    /*{{{*/
     (void)fprintf (pipe,
         "Usage: ruler [OPTIONS]\n"
         "Example: ruler -c 0xFF00FF -W 1024 -H 100    1024x100px Magenta ruler\n"
         "         ruler -color 0x333333               500x50px Grey ruler\n"
         "         ruler                               500x50px Black ruler\n"
-        "Draws a basic single color ruler to the screen. If no -cWH flags are given\n"
-        "use default values of 500x50px and 0x000000 color.\n"
+        "Draws a basic single color ruler to the screen. If no -coWH flags are given\n"
+        "use default values of 500x50px, 0x333333 color, and 80%% opacity.\n"
         "\n"
         "Mandatory arguments to long options are mandatory for short options too.\n"
-        "  -c, --color=HEX     in hex format (0x000000) set the ruler's color\n"
-        "  -W, --width=PIXEL   in pixels set the ruler's initial width\n"
-        "  -H, --height=PIXEL  in pixels set the ruler's initial height\n"
+        "  -c, --color=HEX      in hex format (0x000000) set the ruler's color\n"
+        "  -o, --opacity=FLOAT  a float specifying how opaque the window should be\n"
+        "                       on a scale of 0.0 to 1.0\n"
+        "  -W, --width=PIXEL    in pixels set the ruler's initial width\n"
+        "  -H, --height=PIXEL   in pixels set the ruler's initial height\n"
         "\n"
-        "  -h, --help          show this screen and exit\n"
-        "  -V, --version       output version details and exit\n"
+        "  -h, --help           show this screen and exit\n"
+        "  -V, --version        output version details and exit\n"
         "\n"
         "the PIXEL argument is a positive integer, any floating point numbers\n"
         "are floored.\n"
@@ -192,13 +229,15 @@ print_help (FILE *pipe, int exit_code)
         "or file an issue at <github.com/sage-etcher/ruler.git>\n");
 
     exit (exit_code);
+    /*}}}*/
 }
 
 
 void
 print_version (FILE *pipe, int exit_code)
 {
-    (void)fprintf (pipe, 
+    /*{{{*/
+    (void)fprintf (pipe,
         "ruler 1.0\n"
         "Copyright (C) 2024 Sage I. Hendricks\n"
         "Source: <https://github.com/sage-etcher/ruler.git>\n"
@@ -207,8 +246,11 @@ print_version (FILE *pipe, int exit_code)
         "There is NO WARRANTY, to the extent permitted by law.\n");
 
     exit (exit_code);
+    /*}}}*/
 }
 
 
-
-
+/*
+vim: ts=4 sts=4 sw=4 et fdm=marker
+*/
+/* end of file */
