@@ -22,7 +22,7 @@ if (_c) { \
 /*}}}*/
 
 static SDL_bool resize_window (SDL_Window *win, const SDL_Point *area, SDL_HitTestResult *p_ret);
-static SDL_HitTestResult callback_always_move_window (SDL_Window *win, const SDL_Point *area, void *data);
+static SDL_HitTestResult callback_window_click (SDL_Window *win, const SDL_Point *area, void *data);
 
 
 void
@@ -50,7 +50,7 @@ start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity)
     SDL_SetWindowOpacity (win, opacity);
     SDL_SetWindowMinimumSize (win, WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT);
 
-    SDL_SetWindowHitTest (win, callback_always_move_window, &resize_flag);
+    SDL_SetWindowHitTest (win, callback_window_click, &resize_flag);
 
     SDL_RenderSetVSync (rend, 1);
     SDL_SetRenderDrawColor (
@@ -176,7 +176,7 @@ resize_window (SDL_Window *win, const SDL_Point *area, SDL_HitTestResult *p_ret)
 
 
 SDL_HitTestResult
-callback_always_move_window (SDL_Window *win, const SDL_Point *area, void *data)
+callback_window_click (SDL_Window *win, const SDL_Point *area, void *data)
 {
     /*{{{*/
     const SDL_bool resizeable_flag = *(SDL_bool *)data;
