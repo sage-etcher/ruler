@@ -1,22 +1,21 @@
 ruler 1.0
 
 Creates a plain always-on-top, borderless window, you can set the initial 
-size, color, and opacity of the window. Then at runtime you can resize, move, 
-and lock the window's size.
+size, color, and opacity of the window. And at runtime you can manipulate the
+window's size and position (and a few more things).
 
-Despite the name it's not intended for _meassuring_. Personally, I use it for 
-reading and temporay padding in tiled wms, thems are what it was made for, 
-but there may be other instances it could help, idk tho, censor bar maybe.
-
+Despite the name it's not intended for meassuring. I primarily use it as a way 
+to keep my place while reading, and as padding in tiling window managers. It's
+a very simple program so if you can find use for it, great! if not, that's
+equally alright.
 
 Keyboard Shortcuts (case-insensitive):
   CTRL+L    toggle resize lock
   CTRL+Q    quit
   ESC       quit
 
-
 Install:
-requires pkg-config at build time, and SDL2 at runtime.
+requires pkg-config (or pkgconf) and SDL2.
 ```
 ./autogen.sh
 ./configure
