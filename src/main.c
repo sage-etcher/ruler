@@ -3,6 +3,8 @@
 #include <malloc.h>
 #include <getopt.h>
 
+#include "config.h"
+
 #include <SDL2/SDL.h>
 
 #define HEX_R(x) ((x & 0xFF0000) >> 16)
@@ -308,10 +310,10 @@ print_help (FILE *pipe, int exit_code)
 {
     /*{{{*/
     (void)fprintf (pipe,
-        "Usage: ruler [OPTIONS]\n"
-        "Example: ruler -c 0xFF00FF -W 1024 -H 100    1024x100px Magenta ruler\n"
-        "         ruler -color 0x333333               500x50px Grey ruler\n"
-        "         ruler                               500x50px Black ruler\n"
+        "Usage: " PACKAGE_NAME " [OPTIONS]\n"
+        "Example: " PACKAGE_NAME " -c 0xFF00FF -W 1024 -H 100    1024x100px Magenta ruler\n"
+        "         " PACKAGE_NAME " -color 0x333333               500x50px Grey ruler\n"
+        "         " PACKAGE_NAME "                               500x50px Black ruler\n"
         "Draws a basic single color ruler to the screen. If no -coWH flags are given\n"
         "use default values of 500x50px, 0x333333 color, and 80%% opacity.\n"
         "\n"
@@ -342,8 +344,8 @@ print_help (FILE *pipe, int exit_code)
         " 0  if OK,\n"
         " 1  if error\n"
         "\n"
-        "For bug reporting and help reach out to <sage.message@email.com>,\n"
-        "or file an issue at <https://github.com/sage-etcher/ruler.git>.\n");
+        "For bug reporting and help reach out to <" PACKAGE_BUGREPORT ">,\n"
+        "or file an issue at <" PACKAGE_URL ">.\n");
 
     exit (exit_code);
     /*}}}*/
@@ -355,9 +357,8 @@ print_version (FILE *pipe, int exit_code)
 {
     /*{{{*/
     (void)fprintf (pipe,
-        "ruler 1.0\n"
+        PACKAGE_NAME " " PACKAGE_VERSION "\n"
         "Copyright (C) 2024 Sage I. Hendricks\n"
-        "Source: <https://github.com/sage-etcher/ruler.git>\n"
         "License MIT: The MIT License, <https://spdx.org/licenses/MIT.html>\n"
         "This is free software: you are free to change and redistribute it.\n"
         "There is NO WARRANTY, to the extent permitted by law.\n");
