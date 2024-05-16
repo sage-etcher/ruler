@@ -1,13 +1,11 @@
 bin_PROGRAMS = ruler
 ruler_SOURCES = main.c \
                 common.h \
-                arguements.c arguements.h \
-                display.c display.h \
-                help.c help.h \
-                version.c version.h
+                arguments.c arguments.h \
+                display.c display.h
 
 # libraries
-PKGLIBS=sdl2
+PKGLIBS=sdl2 cargs
 ruler_CFLAGS  = $(shell pkg-config --cflags $(PKGLIBS))
 ruler_LDFLAGS = $(shell pkg-config --libs $(PKGLIBS))
 

@@ -10,17 +10,19 @@ AC_PROG_INSTALL
 
 # check for pkg-config (or pkgconf w/ symlink) program
 AC_CHECK_PROG([PKG_CONFIG_CHECK], [pkg-config], [yes])
-AS_IF([test x"$PKG_CONFIG_CHECK" != x"yes"], [AC_MSG_ERROR([Please install pkg-config before configuring.])])
+AS_IF([test x"$PKG_CONFIG_CHECK" != x"yes"], [AC_MSG_ERROR([pkg-config count not be found.])])
 
 # Check for libraries
 # check for the sdl2 library.
-AC_CHECK_LIB([SDL2], [SDL_Init], [], [AC_MSG_ERROR([Please install SDL2 before configuring.])])
+AC_CHECK_LIB([SDL2], [SDL_Init], [], [AC_MSG_ERROR([The SDL2 library could not be found.])])
 
+#check for the cargs library
+AC_CHECK_LIB([cargs], [cag_option_print], [], [AC_MSG_ERROR([The cargs library could not be found.])])
 
 # Checks for header files.
 AC_CHECK_HEADERS([malloc.h 
-                  getopt.h
-                  SDL2/SDL.h])
+                  SDL2/SDL.h
+                  cargs.h])
 
 # Checks for typedefs, structures, and compile characteristics.
 

@@ -1,6 +1,6 @@
 #include "common.h"
 
-#include "arguements.h"
+#include "arguments.h"
 #include "display.h"
 
 

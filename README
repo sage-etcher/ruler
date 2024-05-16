@@ -15,10 +15,15 @@ Keyboard Shortcuts (case-insensitive):
   ESC       quit
 
 Install:
-requires pkg-config (or pkgconf) and SDL2.
+requires pkg-config[1] (or pkgconf), SDL2[2], and cargs[3].
 ```
 ./autogen.sh
 ./configure
 make 
 sudo make install
 ```
+
+[1] pkg-config   https://www.freedesktop.org/wiki/Software/pkg-config/
+[2] SDL2         https://www.libsdl.org/
+[3] cargs        https://github.com/likle/cargs/
+
