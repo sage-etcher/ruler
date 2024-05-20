@@ -1,6 +1,6 @@
 AC_INIT([ruler], [1.0], [sage.message@email.com], [], [https://github.com/sage-etcher/ruler.git])
 AC_CONFIG_AUX_DIR([autoconf_aux])
-AM_CONDITIONAL([WINDOWS], [test x$(shell echo ${OS}) = x"Windows_NT"])
+AM_CONDITIONAL([WINDOWS], [test x$(echo ${OS}) = x"Windows_NT"])
 AM_INIT_AUTOMAKE([-Wall foreign])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
