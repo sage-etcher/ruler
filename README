@@ -15,7 +15,9 @@ Keyboard Shortcuts (case-insensitive):
   ESC       quit
 
 Install:
-requires pkg-config[1] (or pkgconf), SDL2[2], and cargs[3].
+build time requires autoconf-archive, pkg-config[1] (or pkgconf), SDL2[2], 
+and cargs[3].
+runtim requires SDL2.
 ```
 ./autogen.sh
 ./configure
