@@ -1,14 +1,16 @@
 AC_INIT([ruler], [1.0], [sage.message@email.com], [], [https://github.com/sage-etcher/ruler.git])
 AC_CONFIG_AUX_DIR([autoconf_aux])
-AM_CONDITIONAL([WINDOWS], [test x$(echo ${OS}) = x"Windows_NT"])
 AM_INIT_AUTOMAKE([-Wall foreign])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 
-
 # Checks for programs
 AC_PROG_CC
 AC_PROG_INSTALL
+
+# check for the -mconsole & -mwindows flags, determine if we should use a windows build from them
+AX_CHECK_COMPILE_FLAG([-mconsole], [WINDOWS_FLAG=yes], [WINDOWS_FLAG=no], [-Werror -mwindows])
+AM_CONDITIONAL([WINDOWS], [test "$WINDOWS_FLAG" = "yes"])
 
 # check for pkg-config (or pkgconf w/ symlink) program
 AC_CHECK_PROG([PKG_CONFIG_CHECK], [pkg-config], [yes])
