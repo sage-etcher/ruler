@@ -3,6 +3,13 @@
 #include "arguments.h"
 #include "display.h"
 
+#ifdef _WIN32
+#include "nonportable_windows.h"
+#define CLOSE_WINDOWS_TERMINAL() { close_gui_term(); }
+#else /* !def(_WIND32) */
+#define CLOSE_WINDOWS_TERMINAL() {}
+#endif /* _WIN32 */
+
 
 /* default values */
 float    g_opacity = 0.8f;
@@ -14,6 +21,7 @@ int
 main (int argc, char **argv)
 {
     /*{{{*/
+    CLOSE_WINDOWS_TERMINAL (); /* cheat to avoid -mwindows */
     parse_arguments (argc, argv);
     start_ruler (g_width, g_height, g_hex, g_opacity);
     exit (EXIT_SUCCESS);
