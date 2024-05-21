@@ -8,6 +8,7 @@
 
 #include "config.h"
 
+/* #define _DEBUG  */
 
 #define WINDOW_MIN_WIDTH 1
 #define WINDOW_MIN_HEIGHT 1
@@ -15,6 +16,7 @@ extern float    g_opacity;
 extern unsigned g_width;
 extern unsigned g_height;
 extern unsigned g_hex;
+extern char *   g_image;
 
 
 #endif /* COMMON_H */

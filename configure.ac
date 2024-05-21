@@ -20,6 +20,9 @@ AS_IF([test x"$PKG_CONFIG_CHECK" != x"yes"], [AC_MSG_ERROR([pkg-config count not
 # check for the sdl2 library.
 AC_CHECK_LIB([SDL2], [SDL_Init], [], [AC_MSG_ERROR([The SDL2 library could not be found.])])
 
+# check for the sdl2_image library.
+AC_CHECK_LIB([SDL2_image], [IMG_Init], [], [AC_MSG_ERROR([The SDL2_image library could not be found.])])
+
 #check for the cargs library
 AC_CHECK_LIB([cargs], [cag_option_print], [], [AC_MSG_ERROR([The cargs library could not be found.])])
 

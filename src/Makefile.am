@@ -6,7 +6,7 @@ ruler_SOURCES = main.c \
                 nonportable_windows.c nonportable_windows.h
 
 # libraries
-PKGLIBS=sdl2 cargs
+PKGLIBS=sdl2 SDL2_image cargs
 ruler_CFLAGS  = $(shell pkg-config --cflags $(PKGLIBS))
 ruler_LDFLAGS = $(shell pkg-config --libs $(PKGLIBS))
 

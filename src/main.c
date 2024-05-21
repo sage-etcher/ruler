@@ -16,6 +16,7 @@ float    g_opacity = 0.8f;
 unsigned g_width   = 500;
 unsigned g_height  = 50;
 unsigned g_hex     = 0x333333;
+char *   g_image   = NULL;
 
 int
 main (int argc, char **argv)
@@ -23,7 +24,7 @@ main (int argc, char **argv)
     /*{{{*/
     CLOSE_WINDOWS_TERMINAL (); /* cheat to avoid -mwindows */
     parse_arguments (argc, argv);
-    start_ruler (g_width, g_height, g_hex, g_opacity);
+    start_ruler (g_width, g_height, g_hex, g_opacity, g_image);
     exit (EXIT_SUCCESS);
     /*}}}*/
 }

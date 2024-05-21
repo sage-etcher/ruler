@@ -9,6 +9,7 @@ static struct cag_option options[] =
 {
 /*    VALUE  SHORT  LONG       ARG      DESCRIPTION */
     { 'c',   "c",   "color",   "HEX",   "draw the background color as HEX" },
+    { 'i',   "i",   "image",   "FILE",  "use FILE as ruler background" },
     { 'o',   "o",   "opacity", "FLOAT", "set the window's transparency" },
     { 'W',   "W",   "width",   "PIXEL", "initial width" },
     { 'H',   "H",   "height",  "PIXEL", "initial height" },
@@ -31,6 +32,10 @@ parse_arguments (int argc, char **argv)
             case 'c':
                 value = cag_option_get_value (&context);
                 sscanf (value, "%x", &g_hex);
+                break;
+            case 'i':
+                value = cag_option_get_value (&context);
+                g_image = (char *)value;
                 break;
             case 'o':
                 value = cag_option_get_value (&context);

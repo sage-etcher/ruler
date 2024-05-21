@@ -15,9 +15,9 @@ Keyboard Shortcuts (case-insensitive):
   ESC       quit
 
 Install:
-build time requires autoconf-archive, pkg-config[1] (or pkgconf), SDL2[2], 
-and cargs[3].
-runtim requires SDL2.
+build time requires autoconf-archive[1], pkg-config[2], cargs[3],
+SDL2[4], and SDL2_image[5]
+runtime requires SDL2 and SDL2_image
 ```
 ./autogen.sh
 ./configure
@@ -25,7 +25,9 @@ make
 sudo make install
 ```
 
-[1] pkg-config   https://www.freedesktop.org/wiki/Software/pkg-config/
-[2] SDL2         https://www.libsdl.org/
-[3] cargs        https://github.com/likle/cargs/
+[1] autoconf-archive https://www.gnu.org/software/autoconf-arcive/
+[2] pkg-config       https://www.freedesktop.org/wiki/Software/pkg-config/
+[3] cargs            https://github.com/likle/cargs/
+[4] SDL2             https://www.libsdl.org/
+[5] SDL2_image       https://www.libsdl.org/projects/old/SDL_image/
 
