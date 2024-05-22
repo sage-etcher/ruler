@@ -9,9 +9,9 @@ Window's Dependencies
   MSYS2			https://www.msys2.org/
 
 Inside the MSYS2 MSYS environment install the following
-  autotools		msys/autotools
+  autotools             msys/autotools
   autoconf-archive      msys/autoconf-archive
-  pkg-config      msys/pkgconf
+  pkg-config            msys/pkgconf
   
 Potentially optional MSYS2 programs
   git
