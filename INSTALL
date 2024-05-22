@@ -1,4 +1,10 @@
-./autogen.sh
-./configure
-make
-sudo make install
+Install the needed libraries: SDL2, SDL2_image, cargs
+
+Build and install ruler from source
+  $ git clone https://github.com/sage-etcher/ruler.git
+  $ cd ruler
+  $ ./autogen.sh
+  $ ./configure
+  $ make
+  $ sudo make install
+

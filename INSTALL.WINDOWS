@@ -1,0 +1,115 @@
+The standard procedure for building, installing, and distributing ruler 
+for/on a windows host using MSYS2 and MinGW. Including dependencies and
+libraries.
+
+
+Window's Installers
+  CMake 		<https://cmake.org/download/>
+  MinGW 		<https://sourceforge.net/projects/mingw/>
+  MSYS2			<https://www.msys2.org/>
+
+Inside the MSYS2 MSYS environment install the following
+  autotools		msys/autotools
+  autoconf-archive      msys/autoconf-archive
+  SDL2			<https://github.com/libsdl-org/SDL/releases/latest/>
+  SDL2_Image		<https://github.com/libsdl-org/SDL_Image/releases/latest/>
+  cargs			<https://github.com/likle/cargs/releases/latest/>
+
+Other MSYS2 packages you may need
+  pkg-config
+  git
+  wget
+  dos2unix
+  unix2dos
+  tar
+  xz
+  lzip
+  zip
+  unzip
+  md5sum
+
+Enter the MSYS2 MSYS environment at `C:/msys64/msys2.exe`
+Setup the environment 
+
+  $ cat >> $HOME/.bashrc << "EOF"
+  > export MINGW="/c/MinGW/bin"
+  >
+  > PATH="$PATH:$MINGW"
+  > PATH="$PATH:/c/Program Files/CMake/bin"
+  > export PATH
+  >
+  > # cmake configuration
+  > export CMAKE_GENERATOR="MinGW Makefiles"
+  > export CMAKE_MAKE_PROGRAM="$MINGW/mingw32-make"
+  > export CMAKE_C_COMPILER="$MINGW/gcc"
+  > export CMAKE_CXX_COMPILER="$MINGW/g++"
+  > 
+  > # other configureation
+  > export LDFLAGS="-L/usr/local/lib"
+  > export CFLAGS="-I/usr/local/include"
+  > exprot CXXFLAGS="$CFLAGS"
+  >
+  > export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig"
+  > EOF
+
+  $ source $HOME/.bashrc 
+
+Download and unpack the MinGW Devel binaries for SDL2 and SDL2_Image
+For each do a recursive copy from `x86_64-w64-mingw32/*` to `/usr/local/`
+  <https://github.com/libsdl-org/SDL/releases/download/release-VERSION/SDL2-devel-VERSION-mingw.tar.gz>
+  <https://github.com/libsdl-org/SDL_Image/releases/download/release-VERSION/SDL2_Image-devel-VERSION-mingw.tar.gz>
+
+Download the windows distribution binaries for SDL2 and SDL2_Image
+Create dedicated folders, and unzip the archives into their respective 
+directories
+  <https://github.com/libsdl-org/SDL/releases/download/release-VERSION/SDL2-VERSION-win32-x64.zip>
+  `$HOME/dist/SDL2-VERSION/`
+
+  <https://github.com/libsdl-org/SDL_Image/releases/download/release-VERSION/SDL2_Image-VERSION-win32-x64.zip>
+  `$HOME/dist/SDL2_Image-VERSION/`
+
+Build and install the cargs library
+  $ git clone -b stable https://github.com/likle/cargs.git
+  $ mkdir cargs/build
+  $ pushd cargs/build
+  $ cmake .. -DCMAKE_INSTALL_PREFIX="/usr/local"
+  $ cmake --build . --config Release
+  $ cmake --install .
+  $ popd
+
+Fix the prefix in the libraries's *.pc files.
+  $ sed 's,^prefix=.*,prefix=/usr/local,' \
+  >   -i /usr/local/lib/pkgconfig/sdl2.pc \
+  >      /usr/local/lib/pkgconfig/SDL2_image.pc \
+  >      /usr/local/lib/pkgconfig/cargs.pc
+
+Build Ruler
+  $ git clone https://github.com/sage-etcher/ruler.git
+  $ cd ruler
+  $ ./autogen.sh
+  $ ./configure
+  $ make
+
+Create Distribution Binaries
+  $ make install-strip prefix='' DESTDIR="$PWD/ruler-1.0"
+  $ cp $HOME/dist/SDL2-VERSION/SDL2.dll             ./ruler-1.0/bin/
+  $ cp $HOME/dist/SDL2_Image-VERSION/SDL2_image.dll ./ruler-1.0/bin/
+
+Convert all LFs to CRLFs in the documentation
+  $ unix2dos -s $(find ruler-1.0/share/doc/ruler/ -type f)
+
+Create the md5 checksum
+  $ pushd ruler-1.0
+  $ mkdir manifest
+  $ md5sum -b $(find . -type f |sed 's,^\./,,') >> manifest/md5sums
+  $ popd
+
+Finally the ruler-1.0 folder needs to be archived for distribution. Not all
+are required, however listed are the following: `zip`, `tar`, `tar.gz`, 
+`tar.xz`, and `tar.lz`.
+  $ zip -r9X ruler-1.0-windows-x86_64.zip ruler-1.0/
+  $ tar -cf ruler-1.0-windows-x86_64.tar --owner=0 --group=0 ruler-1.0/
+  $ gzip -k9 ruler-1.0-windows-x86_64.tar
+  $ lzip -k9 ruler-1.0-windows-x86_64.tar
+  $ xz -k9 ruler-1.0-windows-x86_64.tar
+

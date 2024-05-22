@@ -25,9 +25,9 @@ make
 sudo make install
 ```
 
-[1] autoconf-archive https://www.gnu.org/software/autoconf-arcive/
+[1] autoconf-archive https://www.gnu.org/software/autoconf-archive/
 [2] pkg-config       https://www.freedesktop.org/wiki/Software/pkg-config/
 [3] cargs            https://github.com/likle/cargs/
-[4] SDL2             https://www.libsdl.org/
-[5] SDL2_image       https://www.libsdl.org/projects/old/SDL_image/
+[4] SDL2             https://github.com/libsdl-org/SDL/
+[5] SDL2_image       https://github.com/libsdl-org/SDL-Image/
 
