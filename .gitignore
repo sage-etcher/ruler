@@ -50,9 +50,17 @@ src/.deps
 src/test_become_daemon
 config.h
 ruler
+*.exe
+*.dll
 
 *.swp
 *~
 
+*.tar
+*.tar.lz
+*.tar.gz
+*.tar.xz
+*.tar.bz2
+*.zip
 compile_commands.json
 .cache/
