@@ -3,20 +3,17 @@ for/on a windows host using MSYS2 and MinGW. Including dependencies and
 libraries.
 
 
-Window's Installers
-  CMake 		<https://cmake.org/download/>
-  MinGW 		<https://sourceforge.net/projects/mingw/>
-  MSYS2			<https://www.msys2.org/>
+Window's Dependencies
+  CMake 		https://cmake.org/download/
+  MinGW 		https://sourceforge.net/projects/mingw/
+  MSYS2			https://www.msys2.org/
 
 Inside the MSYS2 MSYS environment install the following
   autotools		msys/autotools
   autoconf-archive      msys/autoconf-archive
-  SDL2			<https://github.com/libsdl-org/SDL/releases/latest/>
-  SDL2_Image		<https://github.com/libsdl-org/SDL_Image/releases/latest/>
-  cargs			<https://github.com/likle/cargs/releases/latest/>
-
-Other MSYS2 packages you may need
-  pkg-config
+  pkg-config    msys/pkgconf
+  
+Potentially optional MSYS2 programs
   git
   wget
   dos2unix
@@ -27,6 +24,12 @@ Other MSYS2 packages you may need
   zip
   unzip
   md5sum
+
+Ruler depends on the following libraries, we will discuss how to 
+btain and use them later in the text.
+  SDL2			https://github.com/libsdl-org/SDL/releases/latest/
+  SDL2_Image		https://github.com/libsdl-org/SDL_Image/releases/latest/
+  cargs			https://github.com/likle/cargs/releases/latest/
 
 Enter the MSYS2 MSYS environment at `C:/msys64/msys2.exe`
 Setup the environment 
@@ -56,16 +59,16 @@ Setup the environment
 
 Download and unpack the MinGW Devel binaries for SDL2 and SDL2_Image
 For each do a recursive copy from `x86_64-w64-mingw32/*` to `/usr/local/`
-  <https://github.com/libsdl-org/SDL/releases/download/release-VERSION/SDL2-devel-VERSION-mingw.tar.gz>
-  <https://github.com/libsdl-org/SDL_Image/releases/download/release-VERSION/SDL2_Image-devel-VERSION-mingw.tar.gz>
+  https://github.com/libsdl-org/SDL/releases/download/release-VERSION/SDL2-devel-VERSION-mingw.tar.gz
+  https://github.com/libsdl-org/SDL_Image/releases/download/release-VERSION/SDL2_Image-devel-VERSION-mingw.tar.gz
 
 Download the windows distribution binaries for SDL2 and SDL2_Image
 Create dedicated folders, and unzip the archives into their respective 
 directories
-  <https://github.com/libsdl-org/SDL/releases/download/release-VERSION/SDL2-VERSION-win32-x64.zip>
+  https://github.com/libsdl-org/SDL/releases/download/release-VERSION/SDL2-VERSION-win32-x64.zip
   `$HOME/dist/SDL2-VERSION/`
 
-  <https://github.com/libsdl-org/SDL_Image/releases/download/release-VERSION/SDL2_Image-VERSION-win32-x64.zip>
+  https://github.com/libsdl-org/SDL_Image/releases/download/release-VERSION/SDL2_Image-VERSION-win32-x64.zip
   `$HOME/dist/SDL2_Image-VERSION/`
 
 Build and install the cargs library
