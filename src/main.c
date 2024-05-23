@@ -12,18 +12,15 @@
 
 
 /* default values */
-logmode  g_logging_mode = LOG_TERSE;
+SDL_LogPriority g_logging_mode = SDL_LOG_PRIORITY_ERROR;
 
 unsigned g_width   = 500;
 unsigned g_height  = 50;
 float    g_opacity = 0.8f;
+unsigned g_hex     = 0xffaabb;
 
-SDL_bool g_color_enable = SDL_TRUE;
-unsigned g_hex          = 0xffaabb;
-
-SDL_bool g_image_enable = SDL_FALSE;
-imgmode  g_image_mode   = IMAGE_STRETCH;
-char *   g_image        = NULL;
+char *   g_image      = NULL;
+imgmode  g_image_mode = IMAGE_STRETCH;
 
 
 int
@@ -32,7 +29,7 @@ main (int argc, char **argv)
     /*{{{*/
     CLOSE_WINDOWS_TERMINAL (); /* cheat to avoid -mwindows */
     parse_arguments (argc, argv);
-    start_ruler (g_width, g_height, g_hex, g_opacity, g_image);
+    start_ruler (g_width, g_height, g_hex, g_opacity, g_image, g_image_mode, g_logging_mode);
     exit (EXIT_SUCCESS);
     /*}}}*/
 }

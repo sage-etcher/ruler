@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-void start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity, const char *bg_image);
+void start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity, const char *bg_image, imgmode bg_image_mode, SDL_LogPriority priority);
 
 #endif /* DISPLAY_H */
 

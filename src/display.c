@@ -16,9 +16,11 @@ if (_c) { \
     } \
 } \
 
-#define HEX_R(x) ((x & 0xFF0000) >> 16)
-#define HEX_G(x) ((x & 0x00FF00) >> 8)
-#define HEX_B(x) ((x & 0x0000FF))
+#define HEX_R(_x) ((_x & 0xFF0000) >> 16)
+#define HEX_G(_x) ((_x & 0x00FF00) >> 8)
+#define HEX_B(_x) ((_x & 0x0000FF))
+
+#define LOG_SDL_BOOL(_v) (((_v) == SDL_TRUE) ? "SDL_TRUE" : "SDL_FALSE")
 /*}}}*/
 
 
@@ -40,7 +42,7 @@ static void draw_background_image (SDL_Renderer *rend, SDL_Texture *bg_texture);
 
 
 void
-start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity, const char *bg_image)
+start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity, const char *bg_image, imgmode bg_image_mode, SDL_LogPriority priority)
 {
     /*{{{*/
     SDL_bool runtime = SDL_TRUE;
@@ -53,10 +55,7 @@ start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity,
     SDL_Surface *bg_surface = NULL;
     SDL_Texture *bg_texture = NULL;
 
-#ifdef _DEBUG
-    /* log debug messages */
-    SDL_LogSetAllPriority (SDL_LOG_PRIORITY_DEBUG);
-#endif
+    SDL_LogSetAllPriority (priority);
 
     graphics_init ();
 
@@ -65,27 +64,35 @@ start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity,
     configure_window (win, &resize_flag, opacity);
     set_background_color (rend, hex_color);
    
-    if (use_bg_image) {
+    if (use_bg_image)
+    {
+        SDL_LogVerbose (SDL_LOG_CATEGORY_INPUT, "Using background image: %s\n", bg_image);
         load_image (&bg_surface, &bg_texture, rend, bg_image);
-        use_bg_image = (((bg_surface != NULL) && 
-                         (bg_texture != NULL))
-                        ? SDL_TRUE : SDL_FALSE);
+
+        if ((bg_surface == NULL) || (bg_texture == NULL))
+        {
+            SDL_LogError (SDL_LOG_CATEGORY_INPUT, "Failed to use background image: %s\n", bg_image);
+            use_bg_image = SDL_FALSE;
+        }
+
     }
 
     /* prepare the window to be shown */
     clear_renderer (rend);
-    if (use_bg_image) {
+    if (use_bg_image)
+    {
         draw_background_image (rend, bg_texture);
     }
     SDL_RenderPresent (rend);
     SDL_ShowWindow (win);
 
     /* main runtime loop */
-    while (runtime) {
-        handle_events (win, &runtime, &resize_flag);
+    while (handle_events (win, &runtime, &resize_flag), runtime)
+    {
         clear_renderer (rend);
 
-        if (use_bg_image) {
+        if (use_bg_image)
+        {
             draw_background_image (rend, bg_texture);
         }
 
@@ -214,12 +221,14 @@ keyboard_shortcut (SDL_Keysym *s, SDL_Keycode key, SDL_Keymod mod)
     pressed_mod &= ~(KMOD_SCROLL | KMOD_MODE | KMOD_CAPS | KMOD_NUM | KMOD_RESERVED);
  
     /* check main keypress */
-    if (pressed_key != key) {
+    if (pressed_key != key)
+    {
         return SDL_FALSE;
     }
 
     /* check if anything other than the allowed modifiers are pressed */
-    if (((pressed_mod & ~mod) != 0) || ((pressed_mod & mod) != mod)) {
+    if (((pressed_mod & ~mod) != 0) || ((pressed_mod & mod) != mod))
+    {
         return SDL_FALSE;
     }
 
@@ -236,26 +245,37 @@ handle_events (SDL_Window *win, SDL_bool *runtime, SDL_bool *resize_flag)
     SDL_Event e;
     SDL_Keysym *key; 
 
-    while (SDL_PollEvent (&e)) {
-        switch (e.type) {
+    while (SDL_PollEvent (&e))
+    {
+        switch (e.type)
+        {
         case SDL_KEYDOWN:
             key = &(e.key.keysym);
 
-            if (keyboard_shortcut (key, SDLK_q, KMOD_LCTRL)) {
+            if (keyboard_shortcut (key, SDLK_q, KMOD_LCTRL))
+            {
                 *runtime = SDL_FALSE;
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "*runtime: %s\n", LOG_SDL_BOOL (*runtime));
+                return;
             }
-            else if (keyboard_shortcut (key, SDLK_ESCAPE, KMOD_NONE)) {
+            else if (keyboard_shortcut (key, SDLK_ESCAPE, KMOD_NONE))
+            {
                 *runtime = SDL_FALSE;
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "*runtime: %s\n", LOG_SDL_BOOL (*runtime));
+                return;
             }
-            else if (keyboard_shortcut (key, SDLK_l, KMOD_LCTRL)) {
+            else if (keyboard_shortcut (key, SDLK_l, KMOD_LCTRL))
+            {
                 *resize_flag = (*resize_flag ? SDL_FALSE : SDL_TRUE);
                 SDL_SetWindowResizable(win, *resize_flag);
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "*resize_flag: %s\n", LOG_SDL_BOOL (*resize_flag));
             }
             break;
 
         case SDL_QUIT:
             *runtime = SDL_FALSE;
-            break;
+            SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "*runtime: %s\n", LOG_SDL_BOOL(*runtime));
+            return;
         }
     }
 
@@ -271,15 +291,17 @@ graphics_init (void)
     /*{{{*/
     const int img_flags = IMG_INIT_JPG | IMG_INIT_PNG;
 
-    if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS) != 0) {
-        SDL_Log ("SDL_Init: Failed to init required video, timer, and event support\n");
-        SDL_Log ("SDL_Init: %s!\n", SDL_GetError ());
+    if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS) != 0)
+    {
+        SDL_LogCritical (SDL_LOG_CATEGORY_ERROR, "SDL_Init: Failed to init required video, timer, and event support\n");
+        SDL_LogCritical (SDL_LOG_CATEGORY_ERROR, "SDL_Init: %s!\n", SDL_GetError ());
         exit (EXIT_FAILURE);
     }
 
-    if (IMG_Init (img_flags) != img_flags) {
-        SDL_Log ("IMG_Init: Failed to init jpg and png support\n");
-        SDL_Log ("IMG_Init: %s!\n", IMG_GetError ());
+    if (IMG_Init (img_flags) != img_flags)
+    {
+        SDL_LogWarn (SDL_LOG_CATEGORY_ERROR, "IMG_Init: Failed to init jpg and png support\n");
+        SDL_LogWarn (SDL_LOG_CATEGORY_ERROR, "IMG_Init: %s!\n", IMG_GetError ());
     }
 
     return;
@@ -305,7 +327,6 @@ create_window (int width, int height)
     /*{{{*/
     const char *TITLE= "Ruler";
     SDL_Window *win;
-    int retcode;
 
     /* create the window */
     win = SDL_CreateWindow (
@@ -314,13 +335,16 @@ create_window (int width, int height)
             width, height,
             SDL_WINDOW_BORDERLESS | SDL_WINDOW_SKIP_TASKBAR | SDL_WINDOW_HIDDEN);
 
-    if (!win) {
-        SDL_Log ("SDL_CreateWindow: Failed to create window\n");
-        SDL_Log ("SDL_CreateWindow: %s!\n", SDL_GetError ());
-        exit (EXIT_FAILURE);
+    if (win) 
+    {
+        return win;
     }
 
-    return win;
+    SDL_LogCritical (SDL_LOG_CATEGORY_ERROR, "SDL_CreateWindow: Failed to create window\n");
+    SDL_LogCritical (SDL_LOG_CATEGORY_ERROR, "SDL_CreateWindow: %s!\n", SDL_GetError ());
+
+    exit (EXIT_FAILURE);
+
     /*}}}*/
 }
 
@@ -339,11 +363,12 @@ create_renderer (SDL_Window *win)
 
     if (rend)
     {
+        SDL_LogVerbose (SDL_LOG_CATEGORY_RENDER, "Using primary renderer\n");
         return rend;
     }
     
-    SDL_Log ("SDL_CreateRenderer: Failed to create accelerated vsync renderer\n");
-    SDL_Log ("SDL_CreateRenderer: %s\n", SDL_GetError ());
+    SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_CreateRenderer: Failed to create accelerated vsync renderer\n");
+    SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_CreateRenderer: %s\n", SDL_GetError ());
 
     /* fallback attempt */
     rend = SDL_CreateRenderer (
@@ -353,11 +378,12 @@ create_renderer (SDL_Window *win)
    
     if (rend)
     {
+        SDL_LogVerbose (SDL_LOG_CATEGORY_RENDER, "Using fallback renderer\n");
         return rend;
     }
 
-    SDL_Log ("SDL_CreateRenderer: Failed to create fallback vsync renderer\n");
-    SDL_Log ("SDL_CreateRenderer: %s\n", SDL_GetError ());
+    SDL_LogCritical (SDL_LOG_CATEGORY_ERROR, "SDL_CreateRenderer: Failed to create fallback vsync renderer\n");
+    SDL_LogCritical (SDL_LOG_CATEGORY_ERROR, "SDL_CreateRenderer: %s\n", SDL_GetError ());
 
     /* abort if both fail */
     exit (EXIT_FAILURE);
@@ -378,20 +404,20 @@ configure_window (SDL_Window *win, SDL_bool *resize_flag, float opacity)
     retcode = SDL_SetWindowOpacity (win, opacity);
     if (retcode == -1)
     {
-        SDL_Log ("SDL_SetWindowOpacity: No support for window opacity\n");
-        SDL_Log ("SDL_SetWindowOpacity: %s\n", SDL_GetError ());
+        SDL_LogError (SDL_LOG_CATEGORY_SYSTEM, "SDL_SetWindowOpacity: No support for window opacity\n");
+        SDL_LogError (SDL_LOG_CATEGORY_SYSTEM, "SDL_SetWindowOpacity: %s\n", SDL_GetError ());
     }
     else if (retcode < 0)
     {
-        SDL_Log ("SDL_SetWindowOpacity: Failed to set window opacity\n");
-        SDL_Log ("SDL_SetWindowOpacity: %s\n", SDL_GetError ());
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_SetWindowOpacity: Failed to set window opacity\n");
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_SetWindowOpacity: %s\n", SDL_GetError ());
     }
     
     retcode = SDL_SetWindowHitTest (win, callback_window_click, resize_flag);
     if (retcode != 0)
     {
-        SDL_Log ("SDL_SetWindowHitTest: Failed to set window move/resize callback\n");
-        SDL_Log ("SDL_SetWindowHitTest: %s\n", SDL_GetError ());
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_SetWindowHitTest: Failed to set window move/resize callback\n");
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_SetWindowHitTest: %s\n", SDL_GetError ());
     }
 
     return;
@@ -407,9 +433,10 @@ load_image (SDL_Surface **p_surface, SDL_Texture **p_texture, SDL_Renderer *rend
     SDL_Texture *texture;
 
     surface = IMG_Load (filename);
-    if (!surface) {
-        SDL_Log ("IMG_Load: Failed to create surface from file\n");
-        SDL_Log ("IMG_Load: %s\n", IMG_GetError ());
+    if (!surface)
+    {
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "IMG_Load: Failed to create surface from file\n");
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "IMG_Load: %s\n", IMG_GetError ());
 
         *p_texture = NULL;
         *p_surface = NULL;
@@ -417,9 +444,10 @@ load_image (SDL_Surface **p_surface, SDL_Texture **p_texture, SDL_Renderer *rend
     }
 
     texture = SDL_CreateTextureFromSurface (rend, surface);
-    if (!texture) {
-        SDL_Log ("SDL_CreateTextureFromSurface: Failed to convert image surface to texture\n");
-        SDL_Log ("SDL_CreateTextureFromSurface: %s\n", SDL_GetError ());
+    if (!texture)
+    {
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_CreateTextureFromSurface: Failed to convert image surface to texture\n");
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_CreateTextureFromSurface: %s\n", SDL_GetError ());
 
         *p_texture = NULL;
         *p_surface = NULL;
@@ -446,9 +474,10 @@ set_background_color (SDL_Renderer *rend, unsigned hex_color)
             HEX_B (hex_color),
             SDL_ALPHA_OPAQUE);
 
-    if (retcode != 0) {
-        SDL_Log ("SDL_SetRenderDrawColor: Failed to set background color\n");
-        SDL_Log ("SDL_SetRenderDrawColor: %s\n", SDL_GetError ());
+    if (retcode != 0)
+    {
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_SetRenderDrawColor: Failed to set background color\n");
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_SetRenderDrawColor: %s\n", SDL_GetError ());
     }
 
     return;
@@ -466,8 +495,8 @@ clear_renderer (SDL_Renderer *rend)
 
     if (retcode != 0)
     {
-        SDL_Log ("SDL_RenderClear: Failed to clear the renderer\n");
-        SDL_Log ("SDL_RenderClear: %s\n", SDL_GetError ());
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_RenderClear: Failed to clear the renderer\n");
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_RenderClear: %s\n", SDL_GetError ());
     }
 
     return;
@@ -485,8 +514,8 @@ draw_background_image (SDL_Renderer *rend, SDL_Texture *bg_texture)
 
     if (retcode != 0)
     {
-        SDL_Log ("SDL_RenderCopy: Failed to draw background on the renderer\n");
-        SDL_Log ("SDL_RenderCopy: %s\n", SDL_GetError ());
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_RenderCopy: Failed to draw background on the renderer\n");
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_RenderCopy: %s\n", SDL_GetError ());
     }
 
     return;

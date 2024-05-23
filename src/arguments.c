@@ -9,7 +9,6 @@ static struct cag_option options[] =
 {
 /*    VALUE  SHORT  LONG          ARG      DESCRIPTION */
     { 'c',   "c",   "color",      "HEX",   "draw the background color as HEX" },
-    { 'C',   NULL,  "no-color",    NULL,   "dont draw a background color" },
     { 'i',   "i",   "image",      "FILE",  "use FILE as ruler background" },
     { 'I',   NULL,  "no-image",    NULL,   "dont draw a background image" },
     { 'S',   NULL,  "bg-scale",    NULL,   "scale background image to fit" },
@@ -39,20 +38,15 @@ parse_arguments (int argc, char **argv)
         switch (cag_option_get_identifier (&context))
         {
             case 'c': /* -c --color=HEX */
-                g_color_enable = SDL_TRUE;
                 value = cag_option_get_value (&context);
                 sscanf (value, "%x", &g_hex);
                 break;
-            case 'C': /*    --no-color */
-                g_color_enable = SDL_FALSE;
-                break;
             case 'i': /* -i --image=FILE */
-                g_image_enable = SDL_TRUE;
                 value = cag_option_get_value (&context);
                 g_image = (char *)value;
                 break;
             case 'I': /*    --no-image */
-                g_image_enable = SDL_FALSE;
+                g_image = NULL;
                 break;
             case 'S': /*    --bg-scale */
                 g_image_mode = IMAGE_SCALE;
@@ -79,13 +73,13 @@ parse_arguments (int argc, char **argv)
                 sscanf (value, "%u", &g_height);
                 break;
             case 't': /* -t --terse */
-                g_logging_mode = LOG_TERSE;
+                g_logging_mode = SDL_LOG_PRIORITY_ERROR;
                 break;
             case 'v': /* -v --verbose */
-                g_logging_mode = LOG_VERBOSE;
+                g_logging_mode = SDL_LOG_PRIORITY_VERBOSE;
                 break;
             case 'd': /*    --debug */
-                g_logging_mode = LOG_DEBUG_VERBOSE;
+                g_logging_mode = SDL_LOG_PRIORITY_DEBUG;
                 break;
             case 'h': /* -h --help */
                 print_help (stdout, EXIT_SUCCESS);
@@ -95,6 +89,7 @@ parse_arguments (int argc, char **argv)
                 break;
             case '?': /* error handler */
                 cag_option_print_error (&context, stderr);
+                print_help (stderr, EXIT_SUCCESS);
                 break;
         }
     }
