@@ -29,6 +29,7 @@ AC_CHECK_LIB([cargs], [cag_option_print], [], [AC_MSG_ERROR([The cargs library c
 # Checks for header files.
 AC_CHECK_HEADERS([malloc.h 
                   SDL2/SDL.h
+                  SDL2/SDL_image.h
                   cargs.h])
 
 # Checks for typedefs, structures, and compile characteristics.
