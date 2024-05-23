@@ -11,15 +11,15 @@ static struct cag_option options[] =
     { 'c',   "c",   "color",      "HEX",   "draw the background color as HEX" },
     { 'i',   "i",   "image",      "FILE",  "use FILE as ruler background" },
     { 'I',   NULL,  "no-image",    NULL,   "dont draw a background image" },
-    { 'S',   NULL,  "bg-scale",    NULL,   "scale background image to fit" },
-    { 'T',   NULL,  "bg-stretch",  NULL,   "stretch background image to fit" },
-    { 'R',   NULL,  "bg-crop",     NULL,   "crop background image to fit" }, 
-    { 'L',   NULL,  "bg-tile",     NULL,   "tile the background image" },
+    { 's',   NULL,  "stretch",     NULL,   "stretch background image to fit" },
+    { 'T',   NULL,  "tile",        NULL,   "tile the background image" },
+    { 'f',   NULL,  "fit-width",   NULL,   "fit background to window width" },
+    { 'F',   NULL,  "fit-height",  NULL,   "fit background to window height" },
     { 'o',   "o",   "opacity",    "FLOAT", "set the window's transparency" },
     { 'W',   "W",   "width",      "PIXEL", "initial width" },
     { 'H',   "H",   "height",     "PIXEL", "initial height" },
-    { 't',   "t",   "terse",       NULL,   "disable verbose logging" },
     { 'v',   "v",   "verbose",     NULL,   "enable verbose logging" },
+    { 't',   NULL,  "terse",       NULL,   "disable verbose logging" },
     { 'd',   NULL,  "debug",       NULL,   "enable even more verbose logging for debugging" },
     { 'h',   "h",   "help",        NULL,   "print this message" },
     { 'V',   "V",   "version",     NULL,   "print the versioning message" },
@@ -45,20 +45,20 @@ parse_arguments (int argc, char **argv)
                 value = cag_option_get_value (&context);
                 g_image = (char *)value;
                 break;
-            case 'I': /*    --no-image */
+            case 'I': /* --no-image */
                 g_image = NULL;
                 break;
-            case 'S': /*    --bg-scale */
-                g_image_mode = IMAGE_SCALE;
-                break;
-            case 'T': /*    --bg-stretch */
+            case 's': /* --stretch*/
                 g_image_mode = IMAGE_STRETCH;
                 break;
-            case 'R': /*    --bg-crop */
-                g_image_mode = IMAGE_CROP;
-                break;
-            case 'L': /*    --bg-tile */
+            case 'T': /* --tile */
                 g_image_mode = IMAGE_TILE;
+                break;
+            case 'f': /* --fit-width */
+                g_image_mode = IMAGE_FIT_WIDTH;
+                break;
+            case 'F': /* --fit-height */
+                g_image_mode = IMAGE_FIT_HEIGHT;
                 break;
             case 'o': /* -o --opacity=FLOAT */
                 value = cag_option_get_value (&context);
@@ -72,13 +72,13 @@ parse_arguments (int argc, char **argv)
                 value = cag_option_get_value (&context);
                 sscanf (value, "%u", &g_height);
                 break;
-            case 't': /* -t --terse */
-                g_logging_mode = SDL_LOG_PRIORITY_ERROR;
-                break;
             case 'v': /* -v --verbose */
                 g_logging_mode = SDL_LOG_PRIORITY_VERBOSE;
                 break;
-            case 'd': /*    --debug */
+            case 't': /* --terse */
+                g_logging_mode = SDL_LOG_PRIORITY_ERROR;
+                break;
+            case 'd': /* --debug */
                 g_logging_mode = SDL_LOG_PRIORITY_DEBUG;
                 break;
             case 'h': /* -h --help */

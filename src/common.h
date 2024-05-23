@@ -14,10 +14,10 @@
 /* #define _DEBUG  */
 typedef enum 
 {
-    IMAGE_SCALE,
     IMAGE_STRETCH,
-    IMAGE_CROP,
-    IMAGE_TILE
+    IMAGE_TILE,
+    IMAGE_FIT_WIDTH,
+    IMAGE_FIT_HEIGHT
 } imgmode;
 
 
