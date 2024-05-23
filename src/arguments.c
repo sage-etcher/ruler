@@ -7,14 +7,23 @@ static void print_help    (FILE *pipe, int exit_code);
 
 static struct cag_option options[] =
 {
-/*    VALUE  SHORT  LONG       ARG      DESCRIPTION */
-    { 'c',   "c",   "color",   "HEX",   "draw the background color as HEX" },
-    { 'i',   "i",   "image",   "FILE",  "use FILE as ruler background" },
-    { 'o',   "o",   "opacity", "FLOAT", "set the window's transparency" },
-    { 'W',   "W",   "width",   "PIXEL", "initial width" },
-    { 'H',   "H",   "height",  "PIXEL", "initial height" },
-    { 'h',   "h",   "help",     NULL,   "print this message" },
-    { 'V',   "V",   "version",  NULL,   "print the versioning message" },
+/*    VALUE  SHORT  LONG          ARG      DESCRIPTION */
+    { 'c',   "c",   "color",      "HEX",   "draw the background color as HEX" },
+    { 'C',   NULL,  "no-color",    NULL,   "dont draw a background color" },
+    { 'i',   "i",   "image",      "FILE",  "use FILE as ruler background" },
+    { 'I',   NULL,  "no-image",    NULL,   "dont draw a background image" },
+    { 'S',   NULL,  "bg-scale",    NULL,   "scale background image to fit" },
+    { 'T',   NULL,  "bg-stretch",  NULL,   "stretch background image to fit" },
+    { 'R',   NULL,  "bg-crop",     NULL,   "crop background image to fit" }, 
+    { 'L',   NULL,  "bg-tile",     NULL,   "tile the background image" },
+    { 'o',   "o",   "opacity",    "FLOAT", "set the window's transparency" },
+    { 'W',   "W",   "width",      "PIXEL", "initial width" },
+    { 'H',   "H",   "height",     "PIXEL", "initial height" },
+    { 't',   "t",   "terse",       NULL,   "disable verbose logging" },
+    { 'v',   "v",   "verbose",     NULL,   "enable verbose logging" },
+    { 'd',   NULL,  "debug",       NULL,   "enable even more verbose logging for debugging" },
+    { 'h',   "h",   "help",        NULL,   "print this message" },
+    { 'V',   "V",   "version",     NULL,   "print the versioning message" },
 };
 
 
@@ -29,33 +38,62 @@ parse_arguments (int argc, char **argv)
     {
         switch (cag_option_get_identifier (&context))
         {
-            case 'c':
+            case 'c': /* -c --color=HEX */
+                g_color_enable = SDL_TRUE;
                 value = cag_option_get_value (&context);
                 sscanf (value, "%x", &g_hex);
                 break;
-            case 'i':
+            case 'C': /*    --no-color */
+                g_color_enable = SDL_FALSE;
+                break;
+            case 'i': /* -i --image=FILE */
+                g_image_enable = SDL_TRUE;
                 value = cag_option_get_value (&context);
                 g_image = (char *)value;
                 break;
-            case 'o':
+            case 'I': /*    --no-image */
+                g_image_enable = SDL_FALSE;
+                break;
+            case 'S': /*    --bg-scale */
+                g_image_mode = IMAGE_SCALE;
+                break;
+            case 'T': /*    --bg-stretch */
+                g_image_mode = IMAGE_STRETCH;
+                break;
+            case 'R': /*    --bg-crop */
+                g_image_mode = IMAGE_CROP;
+                break;
+            case 'L': /*    --bg-tile */
+                g_image_mode = IMAGE_TILE;
+                break;
+            case 'o': /* -o --opacity=FLOAT */
                 value = cag_option_get_value (&context);
                 sscanf (value, "%f", &g_opacity);
                 break;
-            case 'W':
+            case 'W': /* -W --width=INTEGER */
                 value = cag_option_get_value (&context);
                 sscanf (value, "%u", &g_width);
                 break;
-            case 'H':
+            case 'H': /* -H --height=INTEGER */
                 value = cag_option_get_value (&context);
                 sscanf (value, "%u", &g_height);
                 break;
-            case 'h':
+            case 't': /* -t --terse */
+                g_logging_mode = LOG_TERSE;
+                break;
+            case 'v': /* -v --verbose */
+                g_logging_mode = LOG_VERBOSE;
+                break;
+            case 'd': /*    --debug */
+                g_logging_mode = LOG_DEBUG_VERBOSE;
+                break;
+            case 'h': /* -h --help */
                 print_help (stdout, EXIT_SUCCESS);
                 break;
-            case 'V':
+            case 'V': /* -V --version */
                 print_version (stdout, EXIT_SUCCESS);
                 break;
-            case '?':
+            case '?': /* error handler */
                 cag_option_print_error (&context, stderr);
                 break;
         }

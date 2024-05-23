@@ -6,17 +6,39 @@
 #include <malloc.h>
 #include <ctype.h>
 
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
+
 #include "config.h"
 
 /* #define _DEBUG  */
+typedef enum 
+{
+    LOG_TERSE,
+    LOG_VERBOSE,
+    LOG_DEBUG_VERBOSE
+} logmode;
+
+typedef enum 
+{
+    IMAGE_SCALE,
+    IMAGE_STRETCH,
+    IMAGE_CROP,
+    IMAGE_TILE
+} imgmode;
+
 
 #define WINDOW_MIN_WIDTH 1
 #define WINDOW_MIN_HEIGHT 1
+extern logmode  g_logging_mode;
 extern float    g_opacity;
 extern unsigned g_width;
 extern unsigned g_height;
+extern SDL_bool g_color_enable;
 extern unsigned g_hex;
+extern SDL_bool g_image_enable;
 extern char *   g_image;
+extern imgmode  g_image_mode;
 
 
 #endif /* COMMON_H */

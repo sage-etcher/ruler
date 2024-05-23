@@ -12,11 +12,19 @@
 
 
 /* default values */
-float    g_opacity = 0.8f;
+logmode  g_logging_mode = LOG_TERSE;
+
 unsigned g_width   = 500;
 unsigned g_height  = 50;
-unsigned g_hex     = 0x333333;
-char *   g_image   = NULL;
+float    g_opacity = 0.8f;
+
+SDL_bool g_color_enable = SDL_TRUE;
+unsigned g_hex          = 0xffaabb;
+
+SDL_bool g_image_enable = SDL_FALSE;
+imgmode  g_image_mode   = IMAGE_STRETCH;
+char *   g_image        = NULL;
+
 
 int
 main (int argc, char **argv)

@@ -2,9 +2,6 @@
 #define DISPLAY_H
 
 #include "common.h"
-#include "SDL2/SDL.h"
-#include "SDL2/SDL_image.h"
-
 
 void start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity, const char *bg_image);
 
