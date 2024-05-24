@@ -32,6 +32,12 @@ extern unsigned g_hex;
 extern char *   g_image;
 extern imgmode  g_image_mode;
 
+#define HEX_R(_x) ((_x & 0xFF0000) >> 16)
+#define HEX_G(_x) ((_x & 0x00FF00) >> 8)
+#define HEX_B(_x) ((_x & 0x0000FF))
+
+#define ABS(_x) ((_x < 0 ? -_x : _x))
+#define LOG_SDL_BOOL(_v) (((_v) == SDL_TRUE) ? "SDL_TRUE" : "SDL_FALSE")
 
 #endif /* COMMON_H */
 

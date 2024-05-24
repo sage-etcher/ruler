@@ -3,6 +3,10 @@ ruler_SOURCES = main.c \
                 common.h \
                 arguments.c arguments.h \
                 display.c display.h \
+                window.c window.h \
+                render.c render.h \
+                events.c events.h \
+                background.c background.h \
                 nonportable_windows.c nonportable_windows.h
 
 # libraries
@@ -15,4 +19,4 @@ ruler_LDFLAGS += -mconsole
 endif
 
 
-# vim: ts=4 sts=4 sw=4 noet
+# vim: ts=4 sts=4 sw=4 et
