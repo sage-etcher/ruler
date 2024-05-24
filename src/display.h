@@ -8,7 +8,7 @@
 #include "events.h"
 #include "background.h"
 
-void start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity, const char *bg_image, imgmode bg_image_mode, SDL_LogPriority priority);
+void start_ruler (settings_obj *settings);
 
 #endif /* DISPLAY_H */
 

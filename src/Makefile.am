@@ -1,7 +1,9 @@
 bin_PROGRAMS = ruler
 ruler_SOURCES = main.c \
-                common.h \
+                common.h default.h \
+                settings.c settings.h \
                 arguments.c arguments.h \
+                runtime.h \
                 display.c display.h \
                 window.c window.h \
                 render.c render.h \

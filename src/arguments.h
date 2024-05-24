@@ -5,7 +5,7 @@
 #include "cargs.h"
 
 
-void parse_arguments (int argc, char **argv);
+void parse_arguments (settings_obj *s, int argc, char **argv);
 
 #endif /* ARGUMENTS_H */
 

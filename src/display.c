@@ -5,61 +5,64 @@ static void graphics_quit (void);
 
 
 void
-start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity, const char *bg_image, imgmode bg_image_mode, SDL_LogPriority priority)
+start_ruler (settings_obj *settings)
 {
     /*{{{*/
-    SDL_bool runtime = SDL_TRUE;
+    runtime_obj *s = SDL_malloc (sizeof (runtime_obj));
+
+    s->runtime = SDL_TRUE;
     
-    SDL_Window *win    = NULL;
-    SDL_Renderer *rend = NULL;
+    s->use_bg_image = (settings->image_path == NULL ? SDL_FALSE : SDL_TRUE);
+    s->bg_mode      = settings->image_mode;
+    s->bg_surface = NULL;
+    s->bg_texture = NULL;
 
-    SDL_bool resize_flag  = SDL_TRUE;
-    SDL_bool use_bg_image = (bg_image == NULL ? SDL_FALSE : SDL_TRUE);
-    SDL_Surface *bg_surface = NULL;
-    SDL_Texture *bg_texture = NULL;
+    s->resize_flag  = SDL_TRUE;
 
-    SDL_LogSetAllPriority (priority);
+
+    SDL_LogSetAllPriority (settings->priority);
 
     graphics_init ();
 
-    win  = create_window (width, height);
-    rend = create_renderer (win);
-    configure_window (win, &resize_flag, opacity);
-    set_render_draw_color (rend, hex_color);
+    s->win  = create_window (settings->width, settings->height);
+    s->rend = create_renderer (s->win);
+    configure_window (s->win, &s->resize_flag, settings->opacity);
+    set_render_draw_color (s->rend, settings->color);
    
-    if (use_bg_image)
+    if (s->use_bg_image)
     {
-        SDL_LogVerbose (SDL_LOG_CATEGORY_INPUT, "Using background image: %s\n", bg_image);
-        load_image (&bg_surface, &bg_texture, rend, bg_image);
+        SDL_LogVerbose (SDL_LOG_CATEGORY_INPUT, "Using background image: %s\n", settings->image_path);
+        load_image (&s->bg_surface, &s->bg_texture, s->rend, settings->image_path);
 
-        if ((bg_surface == NULL) || (bg_texture == NULL))
+        if ((s->bg_surface == NULL) || (s->bg_texture == NULL))
         {
-            SDL_LogError (SDL_LOG_CATEGORY_INPUT, "Failed to use background image: %s\n", bg_image);
-            use_bg_image = SDL_FALSE;
+            SDL_LogError (SDL_LOG_CATEGORY_INPUT, "Failed to use background image: %s\n", settings->image_path);
+            s->use_bg_image = SDL_FALSE;
         }
 
     }
 
     /* show the window */
-    SDL_ShowWindow (win);
+    SDL_ShowWindow (s->win);
 
     /* main runtime loop */
-    while (handle_events (win, &runtime, &resize_flag), runtime)
+    while (handle_events (s), s->runtime)
     {
-        clear_renderer (rend);
+        clear_renderer (s->rend);
 
-        if (use_bg_image)
+        if (s->use_bg_image)
         {
-            draw_background_image (rend, bg_texture, bg_image_mode, bg_surface->clip_rect);
+            draw_background_image (s->rend, s->bg_texture, s->bg_mode, s->bg_surface->clip_rect);
         }
 
-        SDL_RenderPresent (rend);
+        SDL_RenderPresent (s->rend);
     }
 
-    SDL_DestroyTexture (bg_texture);
-    SDL_FreeSurface(bg_surface);
-    SDL_DestroyRenderer (rend);
-    SDL_DestroyWindow (win);
+    SDL_DestroyTexture (s->bg_texture);
+    SDL_FreeSurface(s->bg_surface);
+    SDL_DestroyRenderer (s->rend);
+    SDL_DestroyWindow (s->win);
+    SDL_free (s);
    
     graphics_quit ();
 

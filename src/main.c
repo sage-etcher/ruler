@@ -11,25 +11,15 @@
 #endif /* _WIN32 */
 
 
-/* default values */
-SDL_LogPriority g_logging_mode = SDL_LOG_PRIORITY_ERROR;
-
-unsigned g_width   = 500;
-unsigned g_height  = 50;
-float    g_opacity = 0.8f;
-unsigned g_hex     = 0xffaabb;
-
-char *   g_image      = NULL;
-imgmode  g_image_mode = IMAGE_FILL;
-
-
 int
 main (int argc, char **argv)
 {
     /*{{{*/
+    settings_obj *settings = default_settings ();
     CLOSE_WINDOWS_TERMINAL (); /* cheat to avoid -mwindows */
-    parse_arguments (argc, argv);
-    start_ruler (g_width, g_height, g_hex, g_opacity, g_image, g_image_mode, g_logging_mode);
+    parse_arguments (settings, argc, argv);
+    start_ruler (settings);
+    SDL_free (settings);
     exit (EXIT_SUCCESS);
     /*}}}*/
 }

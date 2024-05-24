@@ -3,7 +3,7 @@
 
 #include "common.h"
 
-void handle_events (SDL_Window *win, SDL_bool *runtime, SDL_bool *resize_flag);
+void handle_events (runtime_obj *s);
 
 #endif /* EVENTS_H */
 

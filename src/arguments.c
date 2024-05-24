@@ -1,6 +1,6 @@
 #include "common.h"
 
-#include <cargs.h>
+#include "cargs.h"
 
 static void print_version (FILE *pipe, int exit_code);
 static void print_help    (FILE *pipe, int exit_code);
@@ -28,7 +28,7 @@ static struct cag_option options[] =
 
 
 void
-parse_arguments (int argc, char **argv)
+parse_arguments (settings_obj *s, int argc, char **argv)
 {
     const char *value = NULL;
 
@@ -40,50 +40,50 @@ parse_arguments (int argc, char **argv)
         {
             case 'c': /* -c --color=HEX */
                 value = cag_option_get_value (&context);
-                sscanf (value, "%x", &g_hex);
+                sscanf (value, "%08x", &(s->color));
                 break;
             case 'i': /* -i --image=FILE */
                 value = cag_option_get_value (&context);
-                g_image = (char *)value;
+                s->image_path = (char *)value;
                 break;
             case 'I': /* --no-image */
-                g_image = NULL;
+                s->image_path = NULL;
                 break;
             case 's': /* --stretch*/
-                g_image_mode = IMAGE_STRETCH;
+                s->image_mode = IMAGE_STRETCH;
                 break;
             case 'T': /* --tile */
-                g_image_mode = IMAGE_TILE;
+                s->image_mode = IMAGE_TILE;
                 break;
             case 'L': /* --fill */
-                g_image_mode = IMAGE_FILL;
+                s->image_mode = IMAGE_FILL;
                 break;
             case 'f': /* --fit-width */
-                g_image_mode = IMAGE_FIT_WIDTH;
+                s->image_mode = IMAGE_FIT_WIDTH;
                 break;
             case 'F': /* --fit-height */
-                g_image_mode = IMAGE_FIT_HEIGHT;
+                s->image_mode = IMAGE_FIT_HEIGHT;
                 break;
             case 'o': /* -o --opacity=FLOAT */
                 value = cag_option_get_value (&context);
-                sscanf (value, "%f", &g_opacity);
+                sscanf (value, "%f", &(s->opacity));
                 break;
             case 'W': /* -W --width=INTEGER */
                 value = cag_option_get_value (&context);
-                sscanf (value, "%u", &g_width);
+                sscanf (value, "%u", &(s->width));
                 break;
             case 'H': /* -H --height=INTEGER */
                 value = cag_option_get_value (&context);
-                sscanf (value, "%u", &g_height);
+                sscanf (value, "%u", &(s->height));
                 break;
             case 'v': /* -v --verbose */
-                g_logging_mode = SDL_LOG_PRIORITY_VERBOSE;
+                s->priority = SDL_LOG_PRIORITY_VERBOSE;
                 break;
             case 't': /* --terse */
-                g_logging_mode = SDL_LOG_PRIORITY_ERROR;
+                s->priority = SDL_LOG_PRIORITY_ERROR;
                 break;
             case 'd': /* --debug */
-                g_logging_mode = SDL_LOG_PRIORITY_DEBUG;
+                s->priority = SDL_LOG_PRIORITY_DEBUG;
                 break;
             case 'h': /* -h --help */
                 print_help (stdout, EXIT_SUCCESS);

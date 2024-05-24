@@ -4,7 +4,7 @@ static SDL_bool keyboard_shortcut (SDL_Keysym *s, SDL_Keycode key, SDL_Keymod mo
 
 
 void
-handle_events (SDL_Window *win, SDL_bool *runtime, SDL_bool *resize_flag)
+handle_events (runtime_obj *s)
 {
     /*{{{*/
     SDL_Event e;
@@ -19,27 +19,27 @@ handle_events (SDL_Window *win, SDL_bool *runtime, SDL_bool *resize_flag)
 
             if (keyboard_shortcut (key, SDLK_q, KMOD_LCTRL))
             {
-                *runtime = SDL_FALSE;
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "*runtime: %s\n", LOG_SDL_BOOL (*runtime));
+                s->runtime = SDL_FALSE;
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "*runtime: %s\n", LOG_SDL_BOOL (s->runtime));
                 return;
             }
             else if (keyboard_shortcut (key, SDLK_ESCAPE, KMOD_NONE))
             {
-                *runtime = SDL_FALSE;
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "*runtime: %s\n", LOG_SDL_BOOL (*runtime));
+                s->runtime = SDL_FALSE;
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "*runtime: %s\n", LOG_SDL_BOOL (s->runtime));
                 return;
             }
             else if (keyboard_shortcut (key, SDLK_l, KMOD_LCTRL))
             {
-                *resize_flag = (*resize_flag ? SDL_FALSE : SDL_TRUE);
-                SDL_SetWindowResizable(win, *resize_flag);
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "*resize_flag: %s\n", LOG_SDL_BOOL (*resize_flag));
+                s->resize_flag = (s->resize_flag ? SDL_FALSE : SDL_TRUE);
+                SDL_SetWindowResizable(s->win, s->resize_flag);
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "*resize_flag: %s\n", LOG_SDL_BOOL (s->resize_flag));
             }
             break;
 
         case SDL_QUIT:
-            *runtime = SDL_FALSE;
-            SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "*runtime: %s\n", LOG_SDL_BOOL(*runtime));
+            s->runtime = SDL_FALSE;
+            SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "*runtime: %s\n", LOG_SDL_BOOL(s->runtime));
             return;
         }
     }
