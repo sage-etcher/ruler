@@ -14,7 +14,7 @@ AM_CONDITIONAL([WINDOWS], [test "$WINDOWS_FLAG" = "yes"])
 
 # check for pkg-config (or pkgconf w/ symlink) program
 AC_CHECK_PROG([PKG_CONFIG_CHECK], [pkg-config], [yes])
-AS_IF([test x"$PKG_CONFIG_CHECK" != x"yes"], [AC_MSG_ERROR([pkg-config count not be found.])])
+AS_IF([test x"$PKG_CONFIG_CHECK" != x"yes"], [AC_MSG_ERROR([pkg-config could not be found.])])
 
 # Check for libraries
 # check for the sdl2 library.
