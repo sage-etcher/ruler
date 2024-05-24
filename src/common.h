@@ -22,6 +22,12 @@
 
 #define ABS(_x) ((_x < 0 ? -_x : _x))
 #define LOG_SDL_BOOL(_v) (((_v) == SDL_TRUE) ? "SDL_TRUE" : "SDL_FALSE")
+#define LOG_IMG_MODE(_v) (((_v) == IMAGE_TILE) ? "IMAGE_TILE" : \
+                          ((_v) == IMAGE_FILL) ? "IMAGE_FILL" : \
+                          ((_v) == IMAGE_FIT_WIDTH) ? "IMAGE_FIT_WIDTH" : \
+                          ((_v) == IMAGE_FIT_HEIGHT) ? "IMAGE_FIT_HEIGHT" : \
+                          ((_v) == IMAGE_STRETCH) ? "IMAGE_STRETCH" : \
+                          "UNKNOWN IMGMODE")
 
 
 #endif /* COMMON_H */
