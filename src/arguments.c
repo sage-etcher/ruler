@@ -13,6 +13,7 @@ static struct cag_option options[] =
     { 'I',   NULL,  "no-image",    NULL,   "dont draw a background image" },
     { 's',   NULL,  "stretch",     NULL,   "stretch background image to fit" },
     { 'T',   NULL,  "tile",        NULL,   "tile the background image" },
+    { 'L',   NULL,  "fill",        NULL,   "scale the background to fill the window" },
     { 'f',   NULL,  "fit-width",   NULL,   "fit background to window width" },
     { 'F',   NULL,  "fit-height",  NULL,   "fit background to window height" },
     { 'o',   "o",   "opacity",    "FLOAT", "set the window's transparency" },
@@ -53,6 +54,9 @@ parse_arguments (int argc, char **argv)
                 break;
             case 'T': /* --tile */
                 g_image_mode = IMAGE_TILE;
+                break;
+            case 'L': /* --fill */
+                g_image_mode = IMAGE_FILL;
                 break;
             case 'f': /* --fit-width */
                 g_image_mode = IMAGE_FIT_WIDTH;

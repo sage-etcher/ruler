@@ -45,7 +45,6 @@ void
 start_ruler (unsigned width, unsigned height, unsigned hex_color, float opacity, const char *bg_image, imgmode bg_image_mode, SDL_LogPriority priority)
 {
     /*{{{*/
-    /*}}}*/
     SDL_bool runtime = SDL_TRUE;
     
     SDL_Window *win    = NULL;
@@ -526,20 +525,76 @@ render_copy (SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *srcrect, SD
 static void
 background_image_stretch (SDL_Renderer *rend, SDL_Texture *bg_texture)
 {
+    /*{{{*/
     render_copy (rend, bg_texture, NULL, NULL);
 
     return;
+    /*}}}*/
 }
 
 
 static void
-background_image_tile (SDL_Renderer *rend, SDL_Texture *bg_texture)
+background_image_tile (SDL_Renderer *rend, SDL_Texture *bg_texture, SDL_Rect *tex_rect, SDL_Rect *rend_rect)
 {
+    /*{{{*/
+    SDL_Rect i, dst, src;
 
+    i.w = tex_rect->w;
+    i.h = tex_rect->h;
+
+    for (i.x = 0; i.x < rend_rect->w; i.x += i.w)
+    {
+        for (i.y = 0; i.y < rend_rect->h; i.y += i.h)
+        {
+            dst = i;
+            dst.w = (((i.x + i.w) >= rend_rect->w) ? (rend_rect->w - i.x) : (dst.w));
+            dst.h = (((i.y + i.h) >= rend_rect->h) ? (rend_rect->h - i.y) : (dst.h));
+
+            src = dst;
+            src.x = 0;
+            src.y = 0;
+             
+            render_copy (rend, bg_texture, &src, &dst);
+        }
+    }
+
+    return;
+    /*}}}*/
 }
 
 
+static void
+background_image_fill (SDL_Renderer *rend, SDL_Texture *bg_texture, SDL_Rect *tex_rect, SDL_Rect *rend_rect)
+{
+    /*{{{*/
+    SDL_Rect crop_rect;
+    float rend_ratio, tex_ratio;
 
+    rend_ratio = ((float)rend_rect->h) / ((float)rend_rect->w);
+    tex_ratio  = ((float)tex_rect->h)  / ((float)tex_rect->w);
+
+    /* texture is wider than the renderer */
+    if (tex_ratio >= rend_ratio)
+    {
+        crop_rect.w = tex_rect->w;
+        crop_rect.h = (int)((float)crop_rect.w * rend_ratio);
+    }
+    /* texture is taller */
+    else /* if (text_ratio < rend_ratio) */
+    {
+        crop_rect.h = tex_rect->h;
+        crop_rect.w = (int)((float)crop_rect.h / rend_ratio);
+    }
+
+    crop_rect.x = (tex_rect->w - crop_rect.w) / 2;
+    crop_rect.y = (tex_rect->h - crop_rect.h) / 2;
+    
+    /* do the copy */
+    render_copy (rend, bg_texture, &crop_rect, NULL);
+
+    return;
+    /*}}}*/
+}
 
 
 static void
@@ -553,34 +608,21 @@ background_image_fit_width (SDL_Renderer *rend, SDL_Texture *bg_texture, SDL_Rec
     rend_ratio = ((float)rend_rect->h) / ((float)rend_rect->w);
     tex_ratio  = ((float)tex_rect->h)  / ((float)tex_rect->w);
 
-    /* if the 2 are the same aspect ratio, we can skip the math and draw both 
-     * as full size. */
-    /* use 0.1e-8 as the "equal-to margin of error" for floating point 
-     * impressision */
-    if (SDL_fabsf (tex_ratio - rend_ratio) <= (float)0.1e-8)
-    {
-        background_image_stretch (rend, bg_texture);
-        return;
-    } 
-    /* if the height:width aspect ratio is smaller for the texture, we need to 
-     * resize the output rectangle on the renderer */
-    else if (tex_ratio < rend_ratio)
-    {
-        cropsrc = rend_rect;
-        cropratio = &tex_ratio;
-        
-        srcrect = tex_rect;
-        dstrect = &crop_rect;
-    }
-    /* otherwise if the renderer's ratio is smaller, the texture's source 
-     * rectangle needs to be resized. */
-    else /* else if (tex_ratio > rend_ratio) */
+    /* texture is wider than the renderer */
+    if (tex_ratio > rend_ratio)
     {
         cropsrc = tex_rect;
         cropratio = &rend_ratio;
-        
         srcrect = &crop_rect;
         dstrect = rend_rect;
+    }
+    /* texture is taller */
+    else /* if (tex_ratio <= rend_ratio) */
+    {
+        cropsrc = rend_rect;
+        cropratio = &tex_ratio;
+        srcrect = tex_rect;
+        dstrect = &crop_rect;
     }
 
     /* create a cropped rectangle */
@@ -609,32 +651,19 @@ background_image_fit_height (SDL_Renderer *rend, SDL_Texture *bg_texture, SDL_Re
     rend_ratio = ((float)rend_rect->h) / ((float)rend_rect->w);
     tex_ratio  = ((float)tex_rect->h)  / ((float)tex_rect->w);
 
-    /* if the 2 are the same aspect ratio, we can skip the math and draw both 
-     * as full size. */
-    /* use 0.1e-8 as the "equal-to margin of error" for floating point 
-     * impressision */
-    if (SDL_fabsf (tex_ratio - rend_ratio) <= (float)0.1e-8)
-    {
-        background_image_stretch (rend, bg_texture);
-        return;
-    } 
-    /* if the height:width aspect ratio is greater for the texture, we need to 
-     * resize the output rectangle on the renderer */
-    else if (tex_ratio > rend_ratio)
+    /* texture is wider than the renderer */
+    if (tex_ratio > rend_ratio)
     {
         cropsrc = rend_rect;
         cropratio = &tex_ratio;
-        
         srcrect = tex_rect;
         dstrect = &crop_rect;
     }
-    /* otherwise if the renderer's ratio is larger, the texture's source 
-     * rectangle needs to be resized. */
-    else /* else if (tex_ratio < rend_ratio) */
+    /* texture is taller than the renderer */
+    else /* if (tex_ratio <= rend_ratio) */
     {
         cropsrc = tex_rect;
         cropratio = &rend_ratio;
-        
         srcrect = &crop_rect;
         dstrect = rend_rect;
     }
@@ -669,7 +698,10 @@ draw_background_image (SDL_Renderer *rend, SDL_Texture *bg_texture, imgmode bg_i
         background_image_stretch (rend, bg_texture);
         break;
     case IMAGE_TILE:
-        background_image_tile (rend, bg_texture);
+        background_image_tile (rend, bg_texture, &tex_rect, &rend_rect);
+        break;
+    case IMAGE_FILL:
+        background_image_fill (rend, bg_texture, &tex_rect, &rend_rect);
         break;
     case IMAGE_FIT_WIDTH:
         background_image_fit_width (rend, bg_texture, &tex_rect, &rend_rect);

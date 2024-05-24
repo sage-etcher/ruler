@@ -20,7 +20,7 @@ float    g_opacity = 0.8f;
 unsigned g_hex     = 0xffaabb;
 
 char *   g_image      = NULL;
-imgmode  g_image_mode = IMAGE_STRETCH;
+imgmode  g_image_mode = IMAGE_FILL;
 
 
 int
