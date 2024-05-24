@@ -12,6 +12,7 @@ typedef struct
     SDL_Renderer *rend;
 
     SDL_bool     use_bg_image;
+    char *       bg_image;
     imgmode      bg_mode;
     SDL_Surface *bg_surface;
     SDL_Texture *bg_texture;

@@ -9,11 +9,15 @@ to keep my place while reading, and as padding in tiling window managers. It's
 a very simple program so if you can find use for it, great! if not, that's
 equally alright.
 
-Keyboard Shortcuts (case-insensitive):
+Keyboard Shortcuts:
   CTRL+L    toggle resize lock
   CTRL+F    cycle image viewing mode 
   CTRL+Q    quit
   ESC       quit
+
+Windows Only Shortcuts:
+  CTRL+O    select background image
+  
 
 Install:
 build time requires autoconf-archive[1], pkg-config[2], cargs[3],

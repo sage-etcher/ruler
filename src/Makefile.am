@@ -1,5 +1,6 @@
 bin_PROGRAMS = ruler
 ruler_SOURCES = main.c \
+                str_utils.c str_utils.h \
                 common.h default.h \
                 settings.c settings.h \
                 arguments.c arguments.h \

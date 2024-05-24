@@ -9,6 +9,8 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 
+#include "str_utils.h"
+
 #include "settings.h"
 #include "runtime.h"
 #include "default.h"
@@ -17,6 +19,13 @@
 
 #include "config.h"
 
+
+#ifdef _WIN32
+#include "nonportable_windows.h"
+#define CLOSE_WINDOWS_TERMINAL() { close_gui_term(); }
+#else /* !def(_WIND32) */
+#define CLOSE_WINDOWS_TERMINAL() {}
+#endif /* _WIN32 */
 
 #define HEX_R(_x) ((_x & 0xFF0000) >> 16)
 #define HEX_G(_x) ((_x & 0x00FF00) >> 8)

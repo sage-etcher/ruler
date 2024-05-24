@@ -3,10 +3,12 @@
 #ifdef _WIN32
 
 #include <windows.h>
-#include <stdbool.h>
+#include "SDL2/SDL.h"
 
-bool ran_from_terminal (void);
+SDL_bool ran_from_terminal (void);
 void close_gui_term (void);
+char * open_file_prompt (void);
+
 
 #endif /* _WIN32 */
 #endif /* NONPORTABLE_WINDOWS_H */

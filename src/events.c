@@ -4,6 +4,10 @@
 static SDL_bool keyboard_shortcut (SDL_Keysym *s, SDL_Keycode key, SDL_Keymod mod);
 static imgmode cycle_mode (imgmode mode);
 
+#if _WIN32
+static void select_new_image (runtime_obj *s);
+#endif /* _WIN32 */
+
 
 void
 handle_events (runtime_obj *s)
@@ -42,6 +46,13 @@ handle_events (runtime_obj *s)
                 s->bg_mode = cycle_mode (s->bg_mode);
                 SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_mode: %s\n", log_imgmode (s->bg_mode));
             }
+            #ifdef _WIN32
+            /* this is only available on windows hosts */
+            else if (keyboard_shortcut (key, SDLK_o, KMOD_LCTRL))
+            {
+                select_new_image (s);
+            }
+            #endif
             break;
 
         case SDL_QUIT:
@@ -98,6 +109,41 @@ cycle_mode (imgmode mode)
     return (mode + 1);
     /*}}}*/
 }
+
+
+#ifdef _WIN32
+static void
+select_new_image (runtime_obj *s)
+{
+    char *new_filename;
+    SDL_Surface *new_surf;
+    SDL_Texture *new_tex;
+    SDL_bool status;
+    
+    /* prompt the use for a file name */
+    new_filename = open_file_prompt ();
+    if (!new_filename) /* if user hit cancel, cancel */
+        return;
+
+    /* try to create a new background image from the inputted file */
+    status = create_background_image (new_filename, s->rend, &new_surf, &new_tex);
+    if (status == SDL_FALSE) /* if we can't, keep the current image */
+        return;
+
+    /* if an image was in use, free it. otherwise values will be NULL */
+    SDL_free (s->bg_image);
+    SDL_DestroyTexture (s->bg_texture);
+    SDL_FreeSurface (s->bg_surface);
+
+    /* and copy the new data over */
+    s->use_bg_image = SDL_TRUE;
+    s->bg_image     = new_filename;
+    s->bg_surface   = new_surf;
+    s->bg_texture   = new_tex;
+    
+    return; 
+}
+#endif /* _WIN32 */
 
 
 /*

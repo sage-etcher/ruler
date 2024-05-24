@@ -12,10 +12,11 @@ start_ruler (settings_obj *settings)
 
     s->runtime = SDL_TRUE;
     
-    s->use_bg_image = (settings->image_path == NULL ? SDL_FALSE : SDL_TRUE);
+    s->bg_image     = str_dup (settings->image_path);
     s->bg_mode      = settings->image_mode;
-    s->bg_surface = NULL;
-    s->bg_texture = NULL;
+    s->bg_surface   = NULL;
+    s->bg_texture   = NULL;
+    s->use_bg_image = (s->bg_image == NULL ? SDL_FALSE : SDL_TRUE);
 
     s->resize_flag  = SDL_TRUE;
 
@@ -31,15 +32,10 @@ start_ruler (settings_obj *settings)
    
     if (s->use_bg_image)
     {
-        SDL_LogVerbose (SDL_LOG_CATEGORY_INPUT, "Using background image: %s\n", settings->image_path);
-        load_image (&s->bg_surface, &s->bg_texture, s->rend, settings->image_path);
-
-        if ((s->bg_surface == NULL) || (s->bg_texture == NULL))
-        {
-            SDL_LogError (SDL_LOG_CATEGORY_INPUT, "Failed to use background image: %s\n", settings->image_path);
-            s->use_bg_image = SDL_FALSE;
-        }
-
+        s->use_bg_image = create_background_image (s->bg_image,
+                                                   s->rend,
+                                                   &s->bg_surface,
+                                                   &s->bg_texture);
     }
 
     /* show the window */

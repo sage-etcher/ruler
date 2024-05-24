@@ -2,6 +2,8 @@
 #define EVENTS_H
 
 #include "common.h"
+#include "background.h"
+
 
 void handle_events (runtime_obj *s);
 

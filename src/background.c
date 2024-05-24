@@ -32,6 +32,8 @@ load_image (SDL_Surface **p_surface, SDL_Texture **p_texture, SDL_Renderer *rend
         SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_CreateTextureFromSurface: Failed to convert image surface to texture\n");
         SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_CreateTextureFromSurface: %s\n", SDL_GetError ());
 
+        SDL_FreeSurface (surface);
+
         *p_texture = NULL;
         *p_surface = NULL;
         return;
@@ -40,6 +42,24 @@ load_image (SDL_Surface **p_surface, SDL_Texture **p_texture, SDL_Renderer *rend
     *p_surface = surface;
     *p_texture = texture;
     return;
+    /*}}}*/
+}
+
+
+SDL_bool 
+create_background_image (char *filename, SDL_Renderer *rend, SDL_Surface **p_surf, SDL_Texture **p_tex)
+{
+    /*{{{*/ 
+    SDL_LogVerbose (SDL_LOG_CATEGORY_INPUT, "Using background image: %s\n", filename);
+    load_image (p_surf, p_tex, rend, filename);
+
+    if ((*p_surf == NULL) || (*p_tex == NULL))
+    {
+        SDL_LogError (SDL_LOG_CATEGORY_INPUT, "Failed to use background image: %s\n", filename);
+        return SDL_FALSE;
+    }
+
+    return SDL_TRUE;
     /*}}}*/
 }
 
