@@ -8,3 +8,43 @@ Build and install ruler from source
   $ make
   $ sudo make install
 
+
+
+Common Issues:
+Issue at the `./configure` step:
+
+error:
+  ...
+  ./configure: line ####: syntax error near unexpected token `-mconsole,'
+  ./configure: line ####: `AX_CHECK_COMPILER_FLAG(-mconsole, WINDOWS_FLAG=yes, WINDOWS_FLAG=no, -Werror -mwindows)'
+fix:
+  AX_CHECK_COMPILER_FLAG is provided by autoconf-archive. The error is due to 
+  the aformentioned macro not being known. Installing autoconf-archive fixes 
+  the issue. After installing it, `./autogen.sh` must be rerun.
+
+  debian       `sudo apt-get install autoconf-archive`
+  arch         `sudo pacman -S autoconf-archive`
+
+
+
+error:
+  configure: error: The SDL2 library could not be found.
+  or
+  configure: error: The SDL2_image library could not be found.
+  or
+  configure: error: The cargs library could not be found.
+fix:
+  configure could not find the library. If it is not installed, that's
+  your issue. If it's installed in a non-standard location, you need to pass 
+  custom LDFLAGS, CFLAGS, and PKG_CONFIG_PATH values to `./configure` for it
+  to find them.
+
+
+
+error:
+  pkg-config could not be found.
+fix:
+  the `pkg-config` program is not found on the path. Is it installed?
+
+
+
