@@ -22,31 +22,31 @@ handle_events (runtime_obj *s)
             if (keyboard_shortcut (key, SDLK_q, KMOD_LCTRL))
             {
                 s->runtime = SDL_FALSE;
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "runtime: %s\n", LOG_SDL_BOOL (s->runtime));
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "runtime: %s\n", log_sdlbool (s->runtime));
                 return;
             }
             else if (keyboard_shortcut (key, SDLK_ESCAPE, KMOD_NONE))
             {
                 s->runtime = SDL_FALSE;
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "runtime: %s\n", LOG_SDL_BOOL (s->runtime));
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "runtime: %s\n", log_sdlbool (s->runtime));
                 return;
             }
             else if (keyboard_shortcut (key, SDLK_l, KMOD_LCTRL))
             {
                 s->resize_flag = (s->resize_flag ? SDL_FALSE : SDL_TRUE);
                 SDL_SetWindowResizable(s->win, s->resize_flag);
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "resize_flag: %s\n", LOG_SDL_BOOL (s->resize_flag));
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "resize_flag: %s\n", log_sdlbool (s->resize_flag));
             }
             else if (keyboard_shortcut (key, SDLK_f, KMOD_LCTRL))
             {
                 s->bg_mode = cycle_mode (s->bg_mode);
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_mode: %s\n", LOG_IMG_MODE (s->bg_mode));
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_mode: %s\n", log_imgmode (s->bg_mode));
             }
             break;
 
         case SDL_QUIT:
             s->runtime = SDL_FALSE;
-            SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "runtime: %s\n", LOG_SDL_BOOL(s->runtime));
+            SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "runtime: %s\n", log_sdlbool (s->runtime));
             return;
         }
     }
@@ -89,23 +89,14 @@ static imgmode
 cycle_mode (imgmode mode)
 {
     /*{{{*/
-    switch (mode)
-    {
-    case IMAGE_STRETCH:
-        return IMAGE_FILL;
-    case IMAGE_FILL:
-        return IMAGE_FIT_HEIGHT;
-    case IMAGE_FIT_HEIGHT:
-        return IMAGE_FIT_WIDTH;
-    case IMAGE_FIT_WIDTH:
-        return IMAGE_TILE;
-    case IMAGE_TILE:
-        return IMAGE_STRETCH;
-    default:
-        return DEFAULT_IMG_MODE;
-    }
-    /*}}}*/
 
+    /* if we are at the last item, cycle back to the first */
+    if (mode >= IMAGE_MODE_LAST)
+        return IMAGE_MODE_FIRST;
+
+    /* all other times, move to the next item */
+    return (mode + 1);
+    /*}}}*/
 }
 
 

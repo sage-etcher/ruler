@@ -4,6 +4,7 @@ ruler_SOURCES = main.c \
                 settings.c settings.h \
                 arguments.c arguments.h \
                 runtime.h \
+                log_helper.c log_helper.h \
                 display.c display.h \
                 window.c window.h \
                 render.c render.h \
