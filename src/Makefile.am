@@ -1,3 +1,4 @@
+
 bin_PROGRAMS = ruler
 ruler_SOURCES = main.c \
                 str_utils.c str_utils.h \
@@ -13,10 +14,10 @@ ruler_SOURCES = main.c \
                 background.c background.h \
                 nonportable_windows.c nonportable_windows.h
 
-# libraries
-PKGLIBS=sdl2 SDL2_image cargs
-ruler_CFLAGS  = $(shell pkg-config --cflags $(PKGLIBS))
-ruler_LDFLAGS = $(shell pkg-config --libs $(PKGLIBS))
+ruler_CFLAGS  = ${CARGS_CFLAGS}  ${SDL2_CFLAGS}  ${SDL2_IMAGE_CFLAGS}
+ruler_LDFLAGS = ${CARGS_LDFLAGS} ${SDL2_LDFLAGS} ${SDL2_IMAGE_LDFLAGS}
+ruler_LDADD   = ${CARGS_LIBS}    ${SDL2_LIBS}    ${SDL2_IMAGE_LIBS} -ltinyfd
+
 
 if WINDOWS
 ruler_LDFLAGS += -mconsole

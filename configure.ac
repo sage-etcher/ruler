@@ -6,39 +6,36 @@ AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs
 AC_PROG_CC
+AC_PROG_RANLIB
 AC_PROG_INSTALL
+AM_PROG_AR
 
 # check for the -mconsole & -mwindows flags, determine if we should use a windows build from them
 AX_CHECK_COMPILE_FLAG([-mconsole], [WINDOWS_FLAG=yes], [WINDOWS_FLAG=no], [-Werror -mwindows])
 AM_CONDITIONAL([WINDOWS], [test "$WINDOWS_FLAG" = "yes"])
 
-# check for pkg-config (or pkgconf w/ symlink) program
-AC_CHECK_PROG([PKG_CONFIG_CHECK], [pkg-config], [yes])
-AS_IF([test x"$PKG_CONFIG_CHECK" != x"yes"], [AC_MSG_ERROR([pkg-config could not be found.])])
-
 # Check for libraries
-# check for the sdl2 library.
-AC_CHECK_LIB([SDL2], [SDL_Init], [], [AC_MSG_ERROR([The SDL2 library could not be found.])])
-
-# check for the sdl2_image library.
-AC_CHECK_LIB([SDL2_image], [IMG_Init], [], [AC_MSG_ERROR([The SDL2_image library could not be found.])])
-
-#check for the cargs library
-AC_CHECK_LIB([cargs], [cag_option_print], [], [AC_MSG_ERROR([The cargs library could not be found.])])
+PKG_CHECK_MODULES([SDL2],       [sdl2],,       [AC_MSG_ERROR([The SDL2 library could not be found.])])
+PKG_CHECK_MODULES([SDL2_IMAGE], [SDL2_image],, [AC_MSG_ERROR([The SDL2_Image library could not be found.])])
+PKG_CHECK_MODULES([CARGS],      [cargs],,      [AC_MSG_ERROR([The library could not be found.])])
 
 # Checks for header files.
-AC_CHECK_HEADERS([malloc.h 
-                  SDL2/SDL.h
-                  SDL2/SDL_image.h
-                  cargs.h])
+AC_CHECK_HEADERS([malloc.h])
+AC_CHECK_HEADERS([SDL2/SDL.h])
+AC_CHECK_HEADERS([SDL2/SDL_image.h])
+AC_CHECK_HEADERS([cargs.h])
 
 # Checks for typedefs, structures, and compile characteristics.
 
 # Check for library functions.
 AC_CHECK_FUNCS([])
 
-AC_CONFIG_FILES([Makefile
-                 src/Makefile])
+AC_CONFIG_FILES([
+    Makefile
+    src/tinyfd/Makefile
+    src/Makefile
+])
+
 AC_OUTPUT
 
 # vim: ts=4 sts=4 sw=4 et

@@ -3,10 +3,8 @@
 
 static SDL_bool keyboard_shortcut (SDL_Keysym *s, SDL_Keycode key, SDL_Keymod mod);
 static imgmode cycle_mode (imgmode mode);
-
-#if _WIN32
 static void select_new_image (runtime_obj *s);
-#endif /* _WIN32 */
+
 
 
 void
@@ -46,13 +44,10 @@ handle_events (runtime_obj *s)
                 s->bg_mode = cycle_mode (s->bg_mode);
                 SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_mode: %s\n", log_imgmode (s->bg_mode));
             }
-            #ifdef _WIN32
-            /* this is only available on windows hosts */
             else if (keyboard_shortcut (key, SDLK_o, KMOD_LCTRL))
             {
                 select_new_image (s);
             }
-            #endif
             break;
 
         case SDL_QUIT:
@@ -111,17 +106,27 @@ cycle_mode (imgmode mode)
 }
 
 
-#ifdef _WIN32
 static void
 select_new_image (runtime_obj *s)
 {
+    const char *patterns[3] = {
+        "*.png",
+        "*.jpg", "*.jpeg"
+    };
     char *new_filename;
     SDL_Surface *new_surf;
     SDL_Texture *new_tex;
     SDL_bool status;
     
     /* prompt the use for a file name */
-    new_filename = open_file_prompt ();
+    new_filename = tinyfd_openFileDialog (
+        "Ruler Open",
+        NULL,
+        3,
+        patterns,
+        "Image Files",
+        0);
+
     if (!new_filename) /* if user hit cancel, cancel */
         return;
 
@@ -131,7 +136,7 @@ select_new_image (runtime_obj *s)
         return;
 
     /* if an image was in use, free it. otherwise values will be NULL */
-    SDL_free (s->bg_image);
+    free (s->bg_image);
     SDL_DestroyTexture (s->bg_texture);
     SDL_FreeSurface (s->bg_surface);
 
@@ -143,7 +148,6 @@ select_new_image (runtime_obj *s)
     
     return; 
 }
-#endif /* _WIN32 */
 
 
 /*

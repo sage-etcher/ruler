@@ -16,6 +16,7 @@
 #include "default.h"
 
 #include "log_helper.h"
+#include "tinyfd/tinyfiledialogs.h"
 
 #include "config.h"
 

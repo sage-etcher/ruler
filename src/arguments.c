@@ -130,9 +130,7 @@ print_help (FILE *pipe, int exit_code)
         "Keyboard Shortcuts:\n"
         "  Ctrl+l   lock size\n"
         "  Ctrl+f   cycle image viewing modes\n"
-#ifdef _WIN32
         "  Ctrl+o   select background image\n"
-#endif /* _WIN32 */
         "  Ctrl+q   quit\n"
         "  Escape   quit\n"
         "\n"

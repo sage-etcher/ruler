@@ -45,9 +45,14 @@ m4/lt~obsolete.m4(LIBDL)
 
 Makefile
 src/Makefile
+src/tinyfd/Makefile
 *.o
+*.a
+*.lib
 src/.deps
+src/tinyfd/.deps
 src/test_become_daemon
+src/tinyfd/test_become_daemon
 config.h
 ruler
 *.exe
