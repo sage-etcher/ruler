@@ -13,9 +13,12 @@ Keyboard Shortcuts:
   CTRL+L    toggle resize lock
   CTRL+F    cycle image viewing mode 
   CTRL+O    select background image
+  CTRL+O    toggle background image on/off
   CTRL+U    select background color
   CTRL+[    decrease opacity by -10%
   CTRL+]    increase opacity by +10%
+  CTRL+/    print shortcut list
+  F1        print shortcut list
   CTRL+Q    quit
   ESC       quit
 

@@ -63,6 +63,20 @@ handle_events (runtime_obj *s)
                 select_new_image (s);
                 SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_image: %s\n", s->bg_image);
             }
+            else if (keyboard_shortcut (key, SDLK_o, (KMOD_LCTRL | KMOD_LSHIFT)))
+            {
+                /* toggle background image */
+                if (s->use_bg_image == SDL_TRUE)
+                {
+                    s->use_bg_image = SDL_FALSE;
+                }
+                else if ((s->use_bg_image == SDL_FALSE) &&
+                         (s->bg_texture != NULL))
+                {
+                    s->use_bg_image = SDL_TRUE;
+                }
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "use_bg_image: %s\n", log_sdlbool(s->use_bg_image));
+            }
             else if (keyboard_shortcut (key, SDLK_u, KMOD_LCTRL)) 
             { 
                 /* new background color */

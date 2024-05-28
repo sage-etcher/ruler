@@ -118,6 +118,7 @@ get_shortcuts (void)
            "  <CTRL+l>   lock size\n"
            "  <CTRL+f>   cycle image viewing modes\n"
            "  <CTRL+o>   select background image\n"
+           "  <CTRL+O>   toggle background image on/off\n"
            "  <CTRL+u>   select background color\n"
            "  <CTRL+[>   decrease opacity by -10%\n"
            "  <CTRL+]>   increase opacity by +10%\n"
