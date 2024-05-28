@@ -115,16 +115,16 @@ get_shortcuts (void)
 {
     /*{{{*/
     return "Keyboard Shortcuts:\n"
-           "  Ctrl+l   lock size\n"
-           "  Ctrl+f   cycle image viewing modes\n"
-           "  Ctrl+o   select background image\n"
-           "  Ctrl+u   select background color\n"
-           "  Ctrl+[   decrease opacity by -10%\n"
-           "  Ctrl+]   increase opacity by +10%\n"
-           "  F1       show shortcut help menu\n"
-           "  Ctrl+/   show shortcut help menu\n"
-           "  Ctrl+q   quit\n"
-           "  Escape   quit\n";
+           "  <CTRL+l>   lock size\n"
+           "  <CTRL+f>   cycle image viewing modes\n"
+           "  <CTRL+o>   select background image\n"
+           "  <CTRL+u>   select background color\n"
+           "  <CTRL+[>   decrease opacity by -10%\n"
+           "  <CTRL+]>   increase opacity by +10%\n"
+           "  <F1>       show shortcut help menu\n"
+           "  <CTRL+/>   show shortcut help menu\n"
+           "  <CTRL+q>   quit\n"
+           "  <ESC>      quit\n";
     /*}}}*/
 }
 
