@@ -6,6 +6,7 @@
 #include "SDL2/SDL.h"
 
 #include "config.h"
+#include "default.h"
 #include "settings.h"
 #include "str_utils.h"
 
@@ -116,12 +117,17 @@ print_help (FILE *pipe, int exit_code)
     (void)fprintf (pipe,
         "Usage: " PACKAGE_NAME " [OPTIONS]\n"
         "Example: " PACKAGE_NAME " -c 0xFF00FF -W 1024 -H 100    1024x100px Magenta ruler\n"
-        "         " PACKAGE_NAME " -color 0x333333               500x50px Grey ruler\n"
-        "         " PACKAGE_NAME "                               500x50px Black ruler\n"
+        "         " PACKAGE_NAME " -color 0x333333               %ux%upx Grey ruler\n"
+        "         " PACKAGE_NAME " --tile -i $HOME/photo.png     %ux%upx photo.png ruler\n"
+        "         " PACKAGE_NAME "                               %ux%upx default ruler\n"
         "Draws a basic single color ruler to the screen. If no -coWH flags are given\n"
-        "use default values of 500x50px, 0x333333 color, and 80%% opacity.\n"
+        "use default values of %ux%upx, 0x%06X color, and %u%% opacity.\n"
         "\n"
-        "Mandatory arguments to long options are mandatory for short options too.\n");
+        "Mandatory arguments to long options are mandatory for short options too.\n",
+        DEFAULT_WIDTH, DEFAULT_HEIGHT,
+        DEFAULT_WIDTH, DEFAULT_HEIGHT,
+        DEFAULT_WIDTH, DEFAULT_HEIGHT,
+        DEFAULT_WIDTH, DEFAULT_HEIGHT, DEFAULT_COLOR, (unsigned)(DEFAULT_OPACITY * 100));
 
     cag_option_print (options, CAG_ARRAY_SIZE (options), pipe);
 
@@ -134,6 +140,8 @@ print_help (FILE *pipe, int exit_code)
         "values from 0x000000 to 0xFFFFFF.\n"
         "\n"
         "the FLOAT arguement is a 32bit float value between 0.0 and 1.0.\n"
+        "\n"
+        "the FILE arguement is the path to a file\n"
         "\n"
         "Keyboard Shortcuts:\n"
         "  Ctrl+l   lock size\n"
