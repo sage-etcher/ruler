@@ -124,13 +124,16 @@ select_new_image (runtime_obj *s)
         "*.png",
         "*.jpg", "*.jpeg"
     };
-    char *new_filename;
     SDL_Surface *new_surf;
     SDL_Texture *new_tex;
     SDL_bool status;
-    
+
+    /* NOTE: tinyfd's returned string are not to be freed by us, doing so may
+     * cause the program to seg fault. the strings are managed from within
+     * the library, as file-static. */
+   
     /* prompt the use for a file name */
-    new_filename = tinyfd_openFileDialog (
+    const char *new_filename = tinyfd_openFileDialog (
         "Ruler Open",
         NULL,
         (sizeof(patterns) / sizeof(patterns[0])),
@@ -142,9 +145,9 @@ select_new_image (runtime_obj *s)
         return;
 
     /* try to create a new background image from the inputted file */
-    status = create_background_image (new_filename, s->rend, &new_surf, &new_tex);
+    status = create_background_image ((char *)new_filename, s->rend, &new_surf, &new_tex);
     if (status == SDL_FALSE) /* if we can't, keep the current image */
-        goto select_new_image_exit;
+        return;
 
     /* if an image was in use, free it. otherwise values will be NULL */
     SDL_free (s->bg_image);
@@ -152,18 +155,16 @@ select_new_image (runtime_obj *s)
     SDL_FreeSurface (s->bg_surface);
 
     /* and copy the new data over */
+    /* NOTE: we use str_dup for bg_image, because SDL_free is not compatible 
+     * with std::malloc. To avoid juggling different mallocs and frees, I've 
+     * opted to instead duplicate the string with SDL_malloc to unify 
+     * everything. */
+
     s->use_bg_image = SDL_TRUE;
     s->bg_image     = str_dup (new_filename);    /* calls SDL_malloc */
     s->bg_surface   = new_surf;
     s->bg_texture   = new_tex;
 
-    /* NOTE: we use str_dup for bg_image, because SDL_free is not compatible 
-     * with std::malloc. To avoid juggling different mallocs and frees, I've 
-     * opted to instead duplicate the string w/ SDL_malloc to unify everything. 
-     */
-
-select_new_image_exit:
-    free (new_filename);
     return; 
     /*}}}*/
 }
