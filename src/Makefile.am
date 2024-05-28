@@ -23,7 +23,8 @@ ruler_LDADD   += -ltinyfd -lm
 
 # windows only
 if WINDOWS
-ruler_LDFLAGS += -mconsole
+ruler_LDFLAGS += -mconsole -L./tinyfd
+ruler_LDADD   += -lcomdlg32 -lole32
 endif
 
 
