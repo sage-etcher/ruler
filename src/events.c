@@ -133,7 +133,7 @@ select_new_image (runtime_obj *s)
     new_filename = tinyfd_openFileDialog (
         "Ruler Open",
         NULL,
-        3,
+        (sizeof(patterns) / sizeof(patterns[0])),
         patterns,
         "Image Files",
         0);
@@ -144,7 +144,7 @@ select_new_image (runtime_obj *s)
     /* try to create a new background image from the inputted file */
     status = create_background_image (new_filename, s->rend, &new_surf, &new_tex);
     if (status == SDL_FALSE) /* if we can't, keep the current image */
-        return;
+        goto select_new_image_exit;
 
     /* if an image was in use, free it. otherwise values will be NULL */
     SDL_free (s->bg_image);
@@ -162,6 +162,7 @@ select_new_image (runtime_obj *s)
      * opted to instead duplicate the string w/ SDL_malloc to unify everything. 
      */
 
+select_new_image_exit:
     free (new_filename);
     return; 
     /*}}}*/
