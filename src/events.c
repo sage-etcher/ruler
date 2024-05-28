@@ -10,13 +10,14 @@
 
 #include "render.h"
 #include "background.h"
+#include "window.h"
 
 
 static SDL_bool keyboard_shortcut (SDL_Keysym *s, SDL_Keycode key, SDL_Keymod mod);
 static imgmode cycle_mode (imgmode mode);
 static void select_new_image (runtime_obj *s);
 static void select_new_color (runtime_obj *s);
-
+static void relative_move_opacity (runtime_obj *s, float relative_move);
 
 void
 handle_events (runtime_obj *s)
@@ -34,36 +35,54 @@ handle_events (runtime_obj *s)
 
             if (keyboard_shortcut (key, SDLK_q, KMOD_LCTRL))
             {
+                /* quit */
                 s->runtime = SDL_FALSE;
                 SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "runtime: %s\n", log_sdlbool (s->runtime));
                 return;
             }
             else if (keyboard_shortcut (key, SDLK_ESCAPE, KMOD_NONE))
             {
+                /* quit */
                 s->runtime = SDL_FALSE;
                 SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "runtime: %s\n", log_sdlbool (s->runtime));
                 return;
             }
             else if (keyboard_shortcut (key, SDLK_l, KMOD_LCTRL))
             {
+                /* lock current size */
                 s->resize_flag = (s->resize_flag ? SDL_FALSE : SDL_TRUE);
                 SDL_SetWindowResizable(s->win, s->resize_flag);
                 SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "resize_flag: %s\n", log_sdlbool (s->resize_flag));
             }
             else if (keyboard_shortcut (key, SDLK_f, KMOD_LCTRL))
             {
+                /* cycle image mode */
                 s->bg_mode = cycle_mode (s->bg_mode);
                 SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_mode: %s\n", log_imgmode (s->bg_mode));
             }
             else if (keyboard_shortcut (key, SDLK_o, KMOD_LCTRL))
             {
+                /* new background image */
                 select_new_image (s);
                 SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_image: %s\n", s->bg_image);
             }
-            else if (keyboard_shortcut (key, SDLK_u, KMOD_LCTRL))
-            {
+            else if (keyboard_shortcut (key, SDLK_u, KMOD_LCTRL)) 
+            { 
+                /* new background color */
                 select_new_color (s);
                 SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_color: 0x%06x\n", s->bg_color);
+            }
+            else if (keyboard_shortcut (key, SDLK_RIGHTBRACKET, KMOD_LCTRL))
+            {
+                /* opacity up 10% */
+                relative_move_opacity (s, 0.10f);
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "opacity: %.02f\n", s->opacity);
+            }
+            else if (keyboard_shortcut (key, SDLK_LEFTBRACKET, KMOD_LCTRL))
+            {
+                /* opacity down 10% */
+                relative_move_opacity (s, -0.10f);
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "opacity: %.02f\n", s->opacity);
             }
             break;
 
@@ -210,6 +229,35 @@ select_new_color (runtime_obj *s)
     /*}}}*/
 }
 
+
+static void
+relative_move_opacity (runtime_obj *s, float relative_move)
+{
+    /*{{{*/
+    float opacity = s->opacity;
+
+    /* calculate new opacity */    
+    opacity += relative_move;
+
+    /* limit it to be between 0 and 1 */
+    if (opacity > 1.0f)
+    {
+        opacity = 1.0f;
+    }
+    else if (opacity < 0.0f)
+    {
+        opacity = 0.0f;
+    }
+
+    /* set the window opacity */
+    set_window_opacity (s->win, opacity);
+    
+    /* update the opacity value in the runtime object */
+    s->opacity = opacity;
+   
+    return; 
+    /*}}}*/
+}
 
 
 /*

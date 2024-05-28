@@ -140,6 +140,8 @@ print_help (FILE *pipe, int exit_code)
         "  Ctrl+f   cycle image viewing modes\n"
         "  Ctrl+o   select background image\n"
         "  Ctrl+u   select background color\n"
+        "  Ctrl+[   decrease opacity by -10%\n"
+        "  Ctrl+]   increase opacity by +10%\n"
         "  Ctrl+q   quit\n"
         "  Escape   quit\n"
         "\n"

@@ -14,6 +14,8 @@ Keyboard Shortcuts:
   CTRL+F    cycle image viewing mode 
   CTRL+O    select background image
   CTRL+U    select background color
+  CTRL+[    decrease opacity by -10%
+  CTRL+]    increase opacity by +10%
   CTRL+Q    quit
   ESC       quit
 

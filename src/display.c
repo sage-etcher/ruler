@@ -25,6 +25,8 @@ start_ruler (settings_obj *settings)
 
     s->runtime = SDL_TRUE;
 
+    s->opacity      = settings->opacity;
+
     s->bg_color     = settings->color;
 
     s->bg_image     = str_dup (settings->image_path);
@@ -42,7 +44,7 @@ start_ruler (settings_obj *settings)
 
     s->win  = create_window (settings->width, settings->height);
     s->rend = create_renderer (s->win);
-    configure_window (s->win, &s->resize_flag, settings->opacity);
+    configure_window (s->win, &s->resize_flag, s->opacity);
     set_render_draw_color (s->rend, s->bg_color);
    
     if (s->use_bg_image)

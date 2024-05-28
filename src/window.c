@@ -64,7 +64,27 @@ configure_window (SDL_Window *win, SDL_bool *resize_flag, float opacity)
     SDL_SetWindowMinimumSize (win, WINDOW_MIN_WIDTH, WINDOW_MIN_HEIGHT);
     SDL_SetWindowResizable (win, *resize_flag);
     SDL_SetWindowAlwaysOnTop (win, SDL_TRUE);
+   
+    set_window_opacity (win, opacity); 
     
+    retcode = SDL_SetWindowHitTest (win, callback_window_click, resize_flag);
+    if (retcode != 0)
+    {
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_SetWindowHitTest: Failed to set window move/resize callback\n");
+        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_SetWindowHitTest: %s\n", SDL_GetError ());
+    }
+
+    return;
+    /*}}}*/
+}
+
+
+void
+set_window_opacity (SDL_Window *win, float opacity)
+{
+    /*{{{*/
+    int retcode; 
+
     retcode = SDL_SetWindowOpacity (win, opacity);
     if (retcode == -1)
     {
@@ -75,13 +95,6 @@ configure_window (SDL_Window *win, SDL_bool *resize_flag, float opacity)
     {
         SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_SetWindowOpacity: Failed to set window opacity\n");
         SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_SetWindowOpacity: %s\n", SDL_GetError ());
-    }
-    
-    retcode = SDL_SetWindowHitTest (win, callback_window_click, resize_flag);
-    if (retcode != 0)
-    {
-        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_SetWindowHitTest: Failed to set window move/resize callback\n");
-        SDL_LogError (SDL_LOG_CATEGORY_ERROR, "SDL_SetWindowHitTest: %s\n", SDL_GetError ());
     }
 
     return;

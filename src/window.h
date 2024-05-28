@@ -6,6 +6,8 @@
 
 SDL_Window *create_window (int width, int height);
 void configure_window (SDL_Window *win, SDL_bool *resize_flag, float opacity);
+void set_window_opacity (SDL_Window *win, float opacity);
+
 
 #endif /* WINDOW_H */
 
