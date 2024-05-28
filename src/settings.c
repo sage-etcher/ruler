@@ -1,5 +1,10 @@
 #include "settings.h"
 
+#include "SDL2/SDL.h"
+
+#include "default.h"
+#include "str_utils.h"
+
 
 settings_obj *
 default_settings (void)
@@ -14,7 +19,7 @@ default_settings (void)
     s->opacity    = DEFAULT_OPACITY;
 
     s->color      = DEFAULT_COLOR;
-    s->image_path = DEFAULT_IMAGE;
+    s->image_path = str_dup (DEFAULT_IMAGE);
     s->image_mode = DEFAULT_IMG_MODE;
 
     return s;

@@ -1,12 +1,18 @@
+
+/* enclose everything in preproc if, so we can include the file regardless of
+ * host system, but only have code available to windows hosts */
+#ifdef _WIN32
+
 #include "nonportable_windows.h"
 
-#include <stdio.h>
+#include <windows.h>
+#include "SDL2/SDL.h"
 
-#ifdef _WIN32
 
 SDL_bool
 ran_from_terminal (void)
 {
+    /*{{{*/
     DWORD proc_id;
     DWORD count = GetConsoleProcessList (&proc_id, 1);   
     
@@ -18,12 +24,14 @@ ran_from_terminal (void)
 
     /* invoked from terminal window */
     return SDL_TRUE;
+    /*}}}*/
 }
 
 
 void
 close_gui_term (void)
 {
+    /*{{{*/
     /* kill the terminal if ran in gui mode */
     if (!ran_from_terminal ())
     {
@@ -31,12 +39,14 @@ close_gui_term (void)
     }
 
     return;
+    /*}}}*/
 }
 
 
 char *
 open_file_prompt (void)
 {
+    /*{{{*/
     OPENFILENAME ofn;
     size_t file_len = 260;
     char *file_buf;
@@ -70,6 +80,7 @@ open_file_prompt (void)
 
     SDL_free (file_buf);
     return NULL;
+    /*}}}*/
 }
 
 

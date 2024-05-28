@@ -1,0 +1,17 @@
+#ifndef IMGMODE_H
+#define IMGMODE_H
+
+typedef enum 
+{
+    IMAGE_STRETCH,
+    IMAGE_TILE,
+    IMAGE_FILL,
+    IMAGE_FIT_WIDTH,
+    IMAGE_FIT_HEIGHT,
+    
+    IMAGE_MODE_FIRST = IMAGE_STRETCH,
+    IMAGE_MODE_LAST  = IMAGE_FIT_HEIGHT,
+} imgmode;
+
+
+#endif /* IMGMODE_H */

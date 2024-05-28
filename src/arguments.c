@@ -1,6 +1,14 @@
-#include "common.h"
+#include "arguments.h"
 
+#include <stdio.h>
+#include <stddef.h>
 #include "cargs.h"
+#include "SDL2/SDL.h"
+
+#include "config.h"
+#include "settings.h"
+#include "str_utils.h"
+
 
 static void print_version (FILE *pipe, int exit_code);
 static void print_help    (FILE *pipe, int exit_code);
@@ -44,7 +52,7 @@ parse_arguments (settings_obj *s, int argc, char **argv)
                 break;
             case 'i': /* -i --image=FILE */
                 value = cag_option_get_value (&context);
-                s->image_path = (char *)value;
+                s->image_path = str_dup (value);
                 break;
             case 'I': /* --no-image */
                 s->image_path = NULL;

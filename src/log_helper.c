@@ -1,5 +1,10 @@
 #include "log_helper.h"
 
+#include "SDL2/SDL.h"
+
+#include "imgmode.h"
+
+
 const char *
 log_sdlbool (SDL_bool s)
 {

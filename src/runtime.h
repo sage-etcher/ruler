@@ -2,7 +2,9 @@
 #define STRUCT_WINDOW_H
 
 #include "SDL2/SDL.h"
-#include "settings.h"
+
+#include "imgmode.h"
+
 
 typedef struct
 {

@@ -1,21 +1,10 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include "default.h"
 #include "SDL2/SDL.h"
 
-typedef enum 
-{
-    IMAGE_STRETCH,
-    IMAGE_TILE,
-    IMAGE_FILL,
-    IMAGE_FIT_WIDTH,
-    IMAGE_FIT_HEIGHT,
-    
-    IMAGE_MODE_FIRST = IMAGE_STRETCH,
-    IMAGE_MODE_LAST  = IMAGE_FIT_HEIGHT,
-} imgmode;
-
+#include "imgmode.h"
+#include "color.h"
 
 typedef struct
 {
@@ -26,13 +15,13 @@ typedef struct
 
     float    opacity;
 
-    uint_fast32_t color;
+    color    color;
     char    *image_path;
-    imgmode image_mode;
+    imgmode  image_mode;
 
 } settings_obj;
 
-settings_obj *default_settings (void);
 
+settings_obj *default_settings (void);
 
 #endif /* SETTINGS_H */

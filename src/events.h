@@ -1,8 +1,7 @@
 #ifndef EVENTS_H
 #define EVENTS_H
 
-#include "common.h"
-#include "background.h"
+#include "runtime.h"
 
 
 void handle_events (runtime_obj *s);

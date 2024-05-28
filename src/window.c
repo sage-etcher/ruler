@@ -1,12 +1,19 @@
 #include "window.h"
 
+#include <stddef.h>
+#include <math.h>
+#include "SDL2/SDL.h"
+
+#include "default.h"
+
+
 /* file-static preprocessor macros */
 /*{{{*/
 #define QUICKDIST(_x,_y) ((_x*_x)+(_y*_y))
 
 #define RESIZEPOINT(_c,_x,_y,_r) \
 if (_c) { \
-    dist = QUICKDIST(ABS((int)(_x)),ABS((int)(_y))); \
+    dist = QUICKDIST(abs(_x),abs(_y)); \
     if (!resize_flag || dist <= closest_dist) { \
         resize_flag = 1; \
         closest_dist = dist; \

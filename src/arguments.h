@@ -1,8 +1,7 @@
 #ifndef ARGUMENTS_H
 #define ARGUMENTS_H
 
-#include "common.h"
-#include "cargs.h"
+#include "settings.h"
 
 
 void parse_arguments (settings_obj *s, int argc, char **argv);

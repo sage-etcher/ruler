@@ -1,5 +1,18 @@
 #include "display.h"
 
+#include <stddef.h>
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
+
+#include "runtime.h"
+#include "settings.h"
+#include "str_utils.h"
+#include "window.h"
+#include "render.h"
+#include "background.h"
+#include "events.h"
+
+
 static void graphics_init (void);
 static void graphics_quit (void);
 

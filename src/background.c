@@ -1,5 +1,11 @@
 #include "background.h"
 
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
+
+#include "imgmode.h"
+#include "render.h"
+
 
 static void background_image_stretch (SDL_Renderer *rend, SDL_Texture *bg_texture);
 static void background_image_tile (SDL_Renderer *rend, SDL_Texture *bg_texture, SDL_Rect *tex_rect, SDL_Rect *rend_rect);

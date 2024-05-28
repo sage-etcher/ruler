@@ -1,5 +1,10 @@
 #include "render.h"
 
+#include <stddef.h>
+#include "SDL2/SDL.h"
+
+#include "color.h"
+
 
 SDL_Renderer * 
 create_renderer (SDL_Window *win)
@@ -44,16 +49,16 @@ create_renderer (SDL_Window *win)
 
 
 void
-set_render_draw_color (SDL_Renderer *rend, unsigned hex_color)
+set_render_draw_color (SDL_Renderer *rend, color hex_color)
 {
     /*{{{*/
     int retcode;
 
     retcode = SDL_SetRenderDrawColor (
             rend, 
-            HEX_R (hex_color),
-            HEX_G (hex_color),
-            HEX_B (hex_color),
+            GET_HEX_R (hex_color),
+            GET_HEX_G (hex_color),
+            GET_HEX_B (hex_color),
             SDL_ALPHA_OPAQUE);
 
     if (retcode != 0)

@@ -1,5 +1,15 @@
 #include "events.h"
-#include "settings.h"
+
+#include "SDL2/SDL.h"
+#include "tinyfd/tinyfiledialogs.h"
+
+#include "str_utils.h"
+#include "imgmode.h"
+#include "runtime.h"
+#include "log_helper.h"
+
+#include "background.h"
+
 
 static SDL_bool keyboard_shortcut (SDL_Keysym *s, SDL_Keycode key, SDL_Keymod mod);
 static imgmode cycle_mode (imgmode mode);
@@ -109,6 +119,7 @@ cycle_mode (imgmode mode)
 static void
 select_new_image (runtime_obj *s)
 {
+    /*{{{*/
     const char *patterns[3] = {
         "*.png",
         "*.jpg", "*.jpeg"
@@ -136,17 +147,24 @@ select_new_image (runtime_obj *s)
         return;
 
     /* if an image was in use, free it. otherwise values will be NULL */
-    free (s->bg_image);
+    SDL_free (s->bg_image);
     SDL_DestroyTexture (s->bg_texture);
     SDL_FreeSurface (s->bg_surface);
 
     /* and copy the new data over */
     s->use_bg_image = SDL_TRUE;
-    s->bg_image     = new_filename;
+    s->bg_image     = str_dup (new_filename);    /* calls SDL_malloc */
     s->bg_surface   = new_surf;
     s->bg_texture   = new_tex;
-    
+
+    /* NOTE: we use str_dup for bg_image, because SDL_free is not compatible 
+     * with std::malloc. To avoid juggling different mallocs and frees, I've 
+     * opted to instead duplicate the string w/ SDL_malloc to unify everything. 
+     */
+
+    free (new_filename);
     return; 
+    /*}}}*/
 }
 
 

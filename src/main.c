@@ -1,7 +1,20 @@
-#include "common.h"
+#include <stddef.h>
+#include "SDL2/SDL.h"
 
+#include "settings.h"
 #include "arguments.h"
 #include "display.h"
+
+/* nonportable windows hack, shush */
+/*{{{*/
+#ifdef _WIN32
+#include "nonportable_windows.h"
+
+#define CLOSE_WINDOWS_TERMINAL() { close_gui_term (); }
+#else
+#define CLOSE_WINDOWS_TERMINAL() {}
+#endif
+/*}}}*/
 
 
 int

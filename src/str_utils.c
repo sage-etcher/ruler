@@ -1,5 +1,9 @@
 #include "str_utils.h"
 
+#include <string.h>
+#include "SDL2/SDL.h"
+
+
 char *
 str_dup (const char *s)
 {
@@ -8,7 +12,7 @@ str_dup (const char *s)
     if (!s)
         return NULL;
 
-    dst = malloc (strlen (s) * sizeof (char));
+    dst = SDL_malloc ((strlen (s) + 1) * sizeof (char));
     if (!dst)
         return NULL;
 

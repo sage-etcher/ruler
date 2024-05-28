@@ -1,12 +1,8 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include "common.h"
+#include "settings.h"
 
-#include "window.h"
-#include "render.h"
-#include "events.h"
-#include "background.h"
 
 void start_ruler (settings_obj *settings);
 
