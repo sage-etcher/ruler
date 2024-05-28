@@ -12,12 +12,10 @@ equally alright.
 Keyboard Shortcuts:
   CTRL+L    toggle resize lock
   CTRL+F    cycle image viewing mode 
+  CTRL+O    select background image
+  CTRL+U    select background color
   CTRL+Q    quit
   ESC       quit
-
-Windows Only Shortcuts:
-  CTRL+O    select background image
-  
 
 Install:
 build time requires autoconf-archive[1], pkg-config[2], cargs[3],

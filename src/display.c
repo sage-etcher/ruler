@@ -24,7 +24,9 @@ start_ruler (settings_obj *settings)
     runtime_obj *s = SDL_malloc (sizeof (runtime_obj));
 
     s->runtime = SDL_TRUE;
-    
+
+    s->bg_color     = settings->color;
+
     s->bg_image     = str_dup (settings->image_path);
     s->bg_mode      = settings->image_mode;
     s->bg_surface   = NULL;
@@ -41,7 +43,7 @@ start_ruler (settings_obj *settings)
     s->win  = create_window (settings->width, settings->height);
     s->rend = create_renderer (s->win);
     configure_window (s->win, &s->resize_flag, settings->opacity);
-    set_render_draw_color (s->rend, settings->color);
+    set_render_draw_color (s->rend, s->bg_color);
    
     if (s->use_bg_image)
     {

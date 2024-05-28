@@ -3,6 +3,7 @@
 
 #include "SDL2/SDL.h"
 
+#include "color.h"
 #include "imgmode.h"
 
 
@@ -12,6 +13,8 @@ typedef struct
 
     SDL_Window   *win;
     SDL_Renderer *rend;
+
+    color        bg_color;
 
     SDL_bool     use_bg_image;
     char *       bg_image;

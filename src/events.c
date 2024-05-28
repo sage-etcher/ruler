@@ -3,18 +3,19 @@
 #include "SDL2/SDL.h"
 #include "tinyfd/tinyfiledialogs.h"
 
-#include "str_utils.h"
 #include "imgmode.h"
 #include "runtime.h"
+#include "str_utils.h"
 #include "log_helper.h"
 
+#include "render.h"
 #include "background.h"
 
 
 static SDL_bool keyboard_shortcut (SDL_Keysym *s, SDL_Keycode key, SDL_Keymod mod);
 static imgmode cycle_mode (imgmode mode);
 static void select_new_image (runtime_obj *s);
-
+static void select_new_color (runtime_obj *s);
 
 
 void
@@ -57,6 +58,12 @@ handle_events (runtime_obj *s)
             else if (keyboard_shortcut (key, SDLK_o, KMOD_LCTRL))
             {
                 select_new_image (s);
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_image: %s\n", s->bg_image);
+            }
+            else if (keyboard_shortcut (key, SDLK_u, KMOD_LCTRL))
+            {
+                select_new_color (s);
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_color: 0x%06x\n", s->bg_color);
             }
             break;
 
@@ -168,6 +175,41 @@ select_new_image (runtime_obj *s)
     return; 
     /*}}}*/
 }
+
+
+static void
+select_new_color (runtime_obj *s)
+{
+    /*{{{*/
+    unsigned char selected_rgb[3];
+    const unsigned char default_rgb[3] = 
+    { 
+        GET_HEX_R(s->bg_color),
+        GET_HEX_G(s->bg_color),
+        GET_HEX_B(s->bg_color) 
+    };
+    const char *color_string = tinyfd_colorChooser (
+            "Ruler Color Picker",
+            NULL,
+            default_rgb,
+            selected_rgb);
+
+    /* handle cancle button */
+    if (!color_string)
+        return;
+
+    /* create new color */
+    SET_HEX_R(s->bg_color, selected_rgb[0]);
+    SET_HEX_G(s->bg_color, selected_rgb[1]);
+    SET_HEX_B(s->bg_color, selected_rgb[2]);
+
+    /* draw renderer with new color */
+    set_render_draw_color (s->rend, s->bg_color);
+
+    return;
+    /*}}}*/
+}
+
 
 
 /*

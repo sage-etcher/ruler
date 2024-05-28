@@ -139,6 +139,7 @@ print_help (FILE *pipe, int exit_code)
         "  Ctrl+l   lock size\n"
         "  Ctrl+f   cycle image viewing modes\n"
         "  Ctrl+o   select background image\n"
+        "  Ctrl+u   select background color\n"
         "  Ctrl+q   quit\n"
         "  Escape   quit\n"
         "\n"
