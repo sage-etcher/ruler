@@ -110,6 +110,24 @@ parse_arguments (settings_obj *s, int argc, char **argv)
 }
 
 
+const char *
+get_shortcuts (void)
+{
+    /*{{{*/
+    return "Keyboard Shortcuts:\n"
+           "  Ctrl+l   lock size\n"
+           "  Ctrl+f   cycle image viewing modes\n"
+           "  Ctrl+o   select background image\n"
+           "  Ctrl+u   select background color\n"
+           "  Ctrl+[   decrease opacity by -10%\n"
+           "  Ctrl+]   increase opacity by +10%\n"
+           "  F1       show shortcut help menu\n"
+           "  Ctrl+/   show shortcut help menu\n"
+           "  Ctrl+q   quit\n"
+           "  Escape   quit\n";
+    /*}}}*/
+}
+
 static void
 print_help (FILE *pipe, int exit_code)
 {
@@ -143,22 +161,15 @@ print_help (FILE *pipe, int exit_code)
         "\n"
         "the FILE arguement is the path to a file\n"
         "\n"
-        "Keyboard Shortcuts:\n"
-        "  Ctrl+l   lock size\n"
-        "  Ctrl+f   cycle image viewing modes\n"
-        "  Ctrl+o   select background image\n"
-        "  Ctrl+u   select background color\n"
-        "  Ctrl+[   decrease opacity by -10%\n"
-        "  Ctrl+]   increase opacity by +10%\n"
-        "  Ctrl+q   quit\n"
-        "  Escape   quit\n"
+        "%s"
         "\n"
         "Exit status:\n"
         " 0  if OK,\n"
         " 1  if error\n"
         "\n"
         "For bug reporting and help reach out to <" PACKAGE_BUGREPORT ">,\n"
-        "or file an issue at <" PACKAGE_URL ">.\n");
+        "or file an issue at <" PACKAGE_URL ">.\n",
+        get_shortcuts ());
 
     exit (exit_code);
     /*}}}*/

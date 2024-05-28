@@ -5,6 +5,7 @@
 
 
 void parse_arguments (settings_obj *s, int argc, char **argv);
+const char *get_shortcuts (void);
 
 #endif /* ARGUMENTS_H */
 

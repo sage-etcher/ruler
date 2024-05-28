@@ -8,6 +8,7 @@
 #include "str_utils.h"
 #include "log_helper.h"
 
+#include "arguments.h"
 #include "render.h"
 #include "background.h"
 #include "window.h"
@@ -18,6 +19,8 @@ static imgmode cycle_mode (imgmode mode);
 static void select_new_image (runtime_obj *s);
 static void select_new_color (runtime_obj *s);
 static void relative_move_opacity (runtime_obj *s, float relative_move);
+static void runtime_shortcuts_prompt (void);
+
 
 void
 handle_events (runtime_obj *s)
@@ -33,14 +36,8 @@ handle_events (runtime_obj *s)
         case SDL_KEYDOWN:
             key = &(e.key.keysym);
 
-            if (keyboard_shortcut (key, SDLK_q, KMOD_LCTRL))
-            {
-                /* quit */
-                s->runtime = SDL_FALSE;
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "runtime: %s\n", log_sdlbool (s->runtime));
-                return;
-            }
-            else if (keyboard_shortcut (key, SDLK_ESCAPE, KMOD_NONE))
+            if ((keyboard_shortcut (key, SDLK_q, KMOD_LCTRL)) ||
+                (keyboard_shortcut (key, SDLK_ESCAPE, KMOD_NONE)))
             {
                 /* quit */
                 s->runtime = SDL_FALSE;
@@ -83,6 +80,14 @@ handle_events (runtime_obj *s)
                 /* opacity down 10% */
                 relative_move_opacity (s, -0.10f);
                 SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "opacity: %.02f\n", s->opacity);
+            }
+            else if ((keyboard_shortcut (key, SDLK_F1, KMOD_NONE)) ||
+                     (keyboard_shortcut (key, SDLK_SLASH, KMOD_LCTRL)) ||
+                     (keyboard_shortcut (key, SDLK_SLASH, (KMOD_LCTRL | KMOD_LSHIFT))))
+            {
+                /* show runtime shortcuts */
+                runtime_shortcuts_prompt ();
+                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "opened shortcut help window"); 
             }
             break;
 
@@ -256,6 +261,22 @@ relative_move_opacity (runtime_obj *s, float relative_move)
     s->opacity = opacity;
    
     return; 
+    /*}}}*/
+}
+
+
+static void
+runtime_shortcuts_prompt (void)
+{
+    /*{{{*/
+    (void)tinyfd_messageBox (
+        "Ruler Shortcuts",
+        get_shortcuts (),
+        "ok",
+        "info",
+        1);
+
+    return;
     /*}}}*/
 }
 
