@@ -16,6 +16,9 @@
 static void graphics_init (void);
 static void graphics_quit (void);
 
+#define REQUIRED_SDL_FLAGS (SDL_INIT_VIDEO | SDL_INIT_EVENTS)
+#define REQUIRED_IMG_FLAGS (IMG_INIT_JPG | IMG_INIT_PNG)
+
 
 void
 start_ruler (settings_obj *settings)
@@ -29,6 +32,9 @@ start_ruler (settings_obj *settings)
 
     s->bg_color     = settings->color;
 
+    s->win          = NULL;
+    s->rend         = NULL;
+
     s->bg_image     = str_dup (settings->image_path);
     s->bg_mode      = settings->image_mode;
     s->bg_surface   = NULL;
@@ -36,7 +42,6 @@ start_ruler (settings_obj *settings)
     s->use_bg_image = (s->bg_image == NULL ? SDL_FALSE : SDL_TRUE);
 
     s->resize_flag  = SDL_TRUE;
-
 
     SDL_LogSetAllPriority (settings->priority);
 
@@ -75,6 +80,7 @@ start_ruler (settings_obj *settings)
     SDL_FreeSurface(s->bg_surface);
     SDL_DestroyRenderer (s->rend);
     SDL_DestroyWindow (s->win);
+    SDL_free (s->bg_image);
     SDL_free (s);
    
     graphics_quit ();
@@ -89,16 +95,15 @@ static void
 graphics_init (void)
 {
     /*{{{*/
-    const int img_flags = IMG_INIT_JPG | IMG_INIT_PNG;
-
-    if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_EVENTS) != 0)
+    if (SDL_Init (REQUIRED_SDL_FLAGS) != 0)
     {
         SDL_LogCritical (SDL_LOG_CATEGORY_ERROR, "SDL_Init: Failed to init required video, timer, and event support\n");
         SDL_LogCritical (SDL_LOG_CATEGORY_ERROR, "SDL_Init: %s!\n", SDL_GetError ());
         exit (EXIT_FAILURE);
     }
 
-    if (IMG_Init (img_flags) != img_flags)
+
+    if (IMG_Init (REQUIRED_IMG_FLAGS) != REQUIRED_IMG_FLAGS)
     {
         SDL_LogWarn (SDL_LOG_CATEGORY_ERROR, "IMG_Init: Failed to init jpg and png support\n");
         SDL_LogWarn (SDL_LOG_CATEGORY_ERROR, "IMG_Init: %s!\n", IMG_GetError ());
@@ -114,6 +119,8 @@ graphics_quit (void)
 {
     /*{{{*/
     IMG_Quit ();
+
+    SDL_QuitSubSystem (REQUIRED_SDL_FLAGS); 
     SDL_Quit ();
 
     return;
