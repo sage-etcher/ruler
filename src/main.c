@@ -26,7 +26,6 @@ main (int argc, char **argv)
     parse_arguments (settings, argc, argv);
     start_ruler (settings);
 
-    SDL_free (settings->image_path);
     SDL_free (settings);
     exit (EXIT_SUCCESS);
     /*}}}*/

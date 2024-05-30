@@ -53,7 +53,7 @@ parse_arguments (settings_obj *s, int argc, char **argv)
                 break;
             case 'i': /* -i --image=FILE */
                 value = cag_option_get_value (&context);
-                s->image_path = str_dup (value);
+                s->image_path = (char *)value;
                 break;
             case 'I': /* --no-image */
                 s->image_path = NULL;
