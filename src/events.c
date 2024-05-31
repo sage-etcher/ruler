@@ -54,7 +54,7 @@ handle_events (runtime_obj *s)
         { SDLK_u,            (KMOD_CTRL),      shortcut_set_color    },
         { SDLK_RIGHTBRACKET, (KMOD_CTRL),      shortcut_inc_opacity  },
         { SDLK_LEFTBRACKET,  (KMOD_CTRL),      shortcut_dec_opacity  },
-        { SDLK_F1,           (KMOD_CTRL),      shortcut_help         },
+        { SDLK_F1,           (KMOD_NONE),      shortcut_help         },
         { SDLK_SLASH,        (KMOD_CTRL),      shortcut_help         },
         { SDLK_SLASH,        (KMOD_CTRLSHIFT), shortcut_help         },
         NULL_SHORTCUT
