@@ -13,101 +13,64 @@
 #include "background.h"
 #include "window.h"
 
+#include "shortcuts.h"
 
-static SDL_bool keyboard_shortcut (SDL_Keysym *s, SDL_Keycode key, SDL_Keymod mod);
 static imgmode cycle_mode (imgmode mode);
 static void select_new_image (runtime_obj *s);
 static void select_new_color (runtime_obj *s);
 static void relative_move_opacity (runtime_obj *s, float relative_move);
 static void runtime_shortcuts_prompt (void);
 
+static void shortcut_quit (const void *e, void *data);
+static void shortcut_resize_lock (const void *e, void *data);
+static void shortcut_cycle_mode (const void *e, void *data);
+static void shortcut_set_image (const void *e, void *data);
+static void shortcut_toggle_image (const void *e, void *data);
+static void shortcut_set_color (const void *e, void *data);
+static void shortcut_inc_opacity (const void *e, void *data);
+static void shortcut_dec_opacity (const void *e, void *data);
+static void shortcut_help (const void *e, void *data);
+
+#define KMOD_ALTSHIFT (KMOD_CTRL | KMOD_ALT)
+#define KMOD_CTRLSHIFT (KMOD_CTRL | KMOD_SHIFT)
+#define KMOD_CTRLALT (KMOD_CTRL | KMOD_ALT)
+#define KMOD_CTRLALTSHIFT (KMOD_CTRL | KMOD_ALT)
 
 void
 handle_events (runtime_obj *s)
 {
     /*{{{*/
     SDL_Event e;
-    SDL_Keysym *key; 
+    
+    static kshortcut control_shortcuts[] =
+    {
+    /*    KEY,                MOD,             CALLBACK */
+        { SDLK_q,            (KMOD_CTRL),      shortcut_quit         },
+        { SDLK_ESCAPE,       (KMOD_NONE),      shortcut_quit         },
+        { SDLK_l,            (KMOD_CTRL),      shortcut_resize_lock  },
+        { SDLK_f,            (KMOD_CTRL),      shortcut_cycle_mode   },
+        { SDLK_o,            (KMOD_CTRL),      shortcut_set_image    },
+        { SDLK_o,            (KMOD_CTRLSHIFT), shortcut_toggle_image },
+        { SDLK_u,            (KMOD_CTRL),      shortcut_set_color    },
+        { SDLK_RIGHTBRACKET, (KMOD_CTRL),      shortcut_inc_opacity  },
+        { SDLK_LEFTBRACKET,  (KMOD_CTRL),      shortcut_dec_opacity  },
+        { SDLK_F1,           (KMOD_CTRL),      shortcut_help         },
+        { SDLK_SLASH,        (KMOD_CTRL),      shortcut_help         },
+        { SDLK_SLASH,        (KMOD_CTRLSHIFT), shortcut_help         },
+        NULL_SHORTCUT
+    };
+
 
     while (SDL_PollEvent (&e))
     {
         switch (e.type)
         {
         case SDL_KEYDOWN:
-            key = &(e.key.keysym);
-
-            if ((keyboard_shortcut (key, SDLK_q, KMOD_LCTRL)) ||
-                (keyboard_shortcut (key, SDLK_ESCAPE, KMOD_NONE)))
-            {
-                /* quit */
-                s->runtime = SDL_FALSE;
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "runtime: %s\n", log_sdlbool (s->runtime));
-                return;
-            }
-            else if (keyboard_shortcut (key, SDLK_l, KMOD_LCTRL))
-            {
-                /* lock current size */
-                s->resize_flag = (s->resize_flag ? SDL_FALSE : SDL_TRUE);
-                SDL_SetWindowResizable(s->win, s->resize_flag);
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "resize_flag: %s\n", log_sdlbool (s->resize_flag));
-            }
-            else if (keyboard_shortcut (key, SDLK_f, KMOD_LCTRL))
-            {
-                /* cycle image mode */
-                s->bg_mode = cycle_mode (s->bg_mode);
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_mode: %s\n", log_imgmode (s->bg_mode));
-            }
-            else if (keyboard_shortcut (key, SDLK_o, KMOD_LCTRL))
-            {
-                /* new background image */
-                select_new_image (s);
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_image: %s\n", s->bg_image);
-            }
-            else if (keyboard_shortcut (key, SDLK_o, (KMOD_LCTRL | KMOD_LSHIFT)))
-            {
-                /* toggle background image */
-                if (s->use_bg_image == SDL_TRUE)
-                {
-                    s->use_bg_image = SDL_FALSE;
-                }
-                else if ((s->use_bg_image == SDL_FALSE) &&
-                         (s->bg_texture != NULL))
-                {
-                    s->use_bg_image = SDL_TRUE;
-                }
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "use_bg_image: %s\n", log_sdlbool(s->use_bg_image));
-            }
-            else if (keyboard_shortcut (key, SDLK_u, KMOD_LCTRL)) 
-            { 
-                /* new background color */
-                select_new_color (s);
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_color: 0x%06x\n", s->bg_color);
-            }
-            else if (keyboard_shortcut (key, SDLK_RIGHTBRACKET, KMOD_LCTRL))
-            {
-                /* opacity up 10% */
-                relative_move_opacity (s, 0.10f);
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "opacity: %.02f\n", s->opacity);
-            }
-            else if (keyboard_shortcut (key, SDLK_LEFTBRACKET, KMOD_LCTRL))
-            {
-                /* opacity down 10% */
-                relative_move_opacity (s, -0.10f);
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "opacity: %.02f\n", s->opacity);
-            }
-            else if ((keyboard_shortcut (key, SDLK_F1, KMOD_NONE)) ||
-                     (keyboard_shortcut (key, SDLK_SLASH, KMOD_LCTRL)) ||
-                     (keyboard_shortcut (key, SDLK_SLASH, (KMOD_LCTRL | KMOD_LSHIFT))))
-            {
-                /* show runtime shortcuts */
-                runtime_shortcuts_prompt ();
-                SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "opened shortcut help window"); 
-            }
+            (void)handle_keyboard_shortcuts (s, control_shortcuts, &e.key.keysym);
             break;
 
         case SDL_QUIT:
-            s->runtime = SDL_FALSE;
-            SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "runtime: %s\n", log_sdlbool (s->runtime));
+            shortcut_quit (NULL, s);
             return;
         }
     }
@@ -117,35 +80,144 @@ handle_events (runtime_obj *s)
 }
 
 
-static SDL_bool
-keyboard_shortcut (SDL_Keysym *s, SDL_Keycode key, SDL_Keymod mod)
+/* shortcut functions */
+/*{{{*/
+static void
+shortcut_quit (const void *e, void *data)
 {
     /*{{{*/
-    SDL_Keycode pressed_key = s->sym;
-    SDL_Keymod  pressed_mod = s->mod;
+    /* quit */
+    runtime_obj *s = data;
 
-    /* remove flags we dont care about */
-    /* only look at Ctrl, Alt, Shift, Gui/Win keys */
-    pressed_mod &= ~(KMOD_SCROLL | KMOD_MODE | KMOD_CAPS | KMOD_NUM | KMOD_RESERVED);
- 
-    /* check main keypress */
-    if (pressed_key != key)
-    {
-        return SDL_FALSE;
-    }
+    s->runtime = SDL_FALSE;
+    SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "runtime: %s\n", log_sdlbool (s->runtime));
 
-    /* check if anything other than the allowed modifiers are pressed */
-    if (((pressed_mod & ~mod) != 0) || ((pressed_mod & mod) != mod))
-    {
-        return SDL_FALSE;
-    }
-
-    /* if both of them match, it is */
-    return SDL_TRUE;
+    return;
     /*}}}*/
 }
 
+static void
+shortcut_resize_lock (const void *e, void *data)
+{
+    /*{{{*/
+    /* lock current size */
+    runtime_obj *s = data;
 
+    s->resize_flag = (s->resize_flag ? SDL_FALSE : SDL_TRUE);
+    SDL_SetWindowResizable(s->win, s->resize_flag);
+    SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "resize_flag: %s\n", log_sdlbool (s->resize_flag));
+
+    return;
+    /*}}}*/
+}
+
+static void
+shortcut_cycle_mode (const void *e, void *data) 
+{
+    /*{{{*/
+    /* cycle image mode */
+    runtime_obj *s = data;
+
+    s->bg_mode = cycle_mode (s->bg_mode);
+    SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_mode: %s\n", log_imgmode (s->bg_mode));
+
+    return;
+    /*}}}*/
+}
+
+static void
+shortcut_set_image (const void *e, void *data)
+{
+    /*{{{*/
+    /* new background image */
+    runtime_obj *s = data;
+
+    select_new_image (s);
+    SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_image: %s\n", s->bg_image);
+
+    return;
+    /*}}}*/
+}
+
+static void
+shortcut_toggle_image (const void *e, void *data)
+{
+    /*{{{*/
+    /* toggle background image */
+    runtime_obj *s = data;
+
+    if (s->use_bg_image == SDL_TRUE)
+    {
+        s->use_bg_image = SDL_FALSE;
+    }
+    else if ((s->use_bg_image == SDL_FALSE) &&
+             (s->bg_texture != NULL))
+    {
+        s->use_bg_image = SDL_TRUE;
+    }
+    SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "use_bg_image: %s\n", log_sdlbool(s->use_bg_image));
+
+    return;
+    /*}}}*/
+}
+
+static void
+shortcut_set_color (const void *e, void *data)
+{ 
+    /*{{{*/
+    /* new background color */
+    runtime_obj *s = data;
+
+    select_new_color (s);
+    SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_color: 0x%06x\n", s->bg_color);
+
+    return;
+    /*}}}*/
+}
+   
+static void
+shortcut_inc_opacity (const void *e, void *data)
+{
+    /*{{{*/
+    /* opacity up 10% */
+    runtime_obj *s = data;
+
+    relative_move_opacity (s, 0.10f);
+    SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "opacity: %.02f\n", s->opacity);
+
+    return;
+    /*}}}*/
+}
+
+static void
+shortcut_dec_opacity (const void *e, void *data)
+{
+    /*{{{*/
+    /* opacity up 10% */
+    runtime_obj *s = data;
+
+    relative_move_opacity (s, -0.10f);
+    SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "opacity: %.02f\n", s->opacity);
+
+    return;
+    /*}}}*/
+}
+
+static void
+shortcut_help (const void *e, void *data)
+{
+    /*{{{*/
+    /* show runtime shortcuts */
+    runtime_shortcuts_prompt ();
+    SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "opened shortcut help window"); 
+
+    return;
+    /*}}}*/
+}
+/*}}}*/
+
+
+/* helper functions */
 static imgmode
 cycle_mode (imgmode mode)
 {

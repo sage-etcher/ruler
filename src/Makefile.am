@@ -9,6 +9,7 @@ ruler_SOURCES = main.c \
                 display.c display.h \
                 window.c window.h \
                 render.c render.h \
+                shortcuts.c shortcuts.h \
                 events.c events.h \
                 background.c background.h \
                 nonportable_windows.c nonportable_windows.h
@@ -19,11 +20,12 @@ ruler_LDFLAGS = ${CARGS_LDFLAGS} ${SDL2_LDFLAGS} ${SDL2_IMAGE_LDFLAGS}
 ruler_LDADD   = ${CARGS_LIBS}    ${SDL2_LIBS}    ${SDL2_IMAGE_LIBS} 
 
 # other libraries 
+ruler_LDFLAGS += -L./tinyfd
 ruler_LDADD   += -ltinyfd -lm
 
 # windows only
 if WINDOWS
-ruler_LDFLAGS += -mconsole -L./tinyfd
+ruler_LDFLAGS += -mconsole
 ruler_LDADD   += -lcomdlg32 -lole32
 endif
 
