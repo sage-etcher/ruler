@@ -12,7 +12,7 @@ str_dup (const char *s)
     if (!s)
         return NULL;
 
-    dst = SDL_malloc ((strlen (s) + 1) * sizeof (char));
+    dst = (char *)SDL_malloc ((strlen (s) + 1) * sizeof (char));
     if (!dst)
         return NULL;
 

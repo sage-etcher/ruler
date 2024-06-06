@@ -51,9 +51,9 @@ handle_keyboard_shortcuts (runtime_obj *s, const kshortcut *base_shortcuts, cons
 static SDL_bool
 is_shortcut_pressed (const SDL_Keysym *key, kshortcut *shortcut)
 {
-    const SDL_Keymod CHECK_MODIFIERS = (KMOD_CTRL | KMOD_ALT | KMOD_SHIFT | KMOD_GUI);
-    SDL_Keycode primary   = key->sym;
-    SDL_Keymod  modifiers = key->mod;
+    const SDL_Keymod CHECK_MODIFIERS = (SDL_Keymod)(KMOD_CTRL | KMOD_ALT | KMOD_SHIFT | KMOD_GUI);
+    SDL_Keycode primary   = (SDL_Keycode)key->sym;
+    SDL_Keymod  modifiers = (SDL_Keymod)key->mod;
 
     /* check primary key */
     if (primary != shortcut->primary)
@@ -63,7 +63,7 @@ is_shortcut_pressed (const SDL_Keysym *key, kshortcut *shortcut)
 
     /* clean modifiers */
     /* blank all bits that we aren't checking */
-    modifiers &= CHECK_MODIFIERS;
+    modifiers = (SDL_Keymod)(modifiers & CHECK_MODIFIERS);
 
     /* check that no extra modifiers are pressed */
     if ((modifiers & ~(shortcut->modifiers)) != 0)

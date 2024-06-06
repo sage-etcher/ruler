@@ -1,8 +1,8 @@
-
 bin_PROGRAMS = ruler
 ruler_SOURCES = main.c \
                 extern-c-helper.h default.h \
-                runtime.h settings.c settings.h imgmode.h color.h \
+                runtime.h settings.c settings.h imgmode.h \
+                color.c color.h \
                 str_utils.c str_utils.h \
                 arguments.c arguments.h \
                 log_helper.c log_helper.h \
@@ -22,6 +22,9 @@ ruler_LDADD   = ${CARGS_LIBS}    ${SDL2_LIBS}    ${SDL2_IMAGE_LIBS}
 # other libraries 
 ruler_LDFLAGS += -L./tinyfd
 ruler_LDADD   += -ltinyfd -lm
+
+# other flags
+ruler_CFLAGS += -Wall -Wextra -Wpedantic
 
 # windows only
 if WINDOWS

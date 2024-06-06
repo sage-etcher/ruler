@@ -1,7 +1,7 @@
 #ifndef SHORTCUTS_H
 #define SHORTCUTS_H
 #include "extern-c-helper.h"
-EXTERN_C_START()
+EXTERN_C_START
 
 #include <SDL2/SDL.h>
 
@@ -17,9 +17,7 @@ typedef struct
     kshort_callback callback;
 } kshortcut;
 
-#define NULL_SHORTCUT {0, 0, NULL}
-
 SDL_bool handle_keyboard_shortcuts (runtime_obj *s, const kshortcut *base_shortcuts, const SDL_Keysym *key);
 
-EXTERN_C_END()
+EXTERN_C_END
 #endif /* SHORTCUTS_H */

@@ -1,14 +1,14 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 #include "extern-c-helper.h"
-EXTERN_C_START()
+EXTERN_C_START
 
 #include "settings.h"
 
 
 void start_ruler (settings_obj *settings);
 
-EXTERN_C_END()
+EXTERN_C_END
 #endif /* DISPLAY_H */
 
 /*

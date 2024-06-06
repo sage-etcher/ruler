@@ -9,7 +9,7 @@
 settings_obj *
 default_settings (void)
 {
-    settings_obj *s = SDL_malloc (sizeof (settings_obj));
+    settings_obj *s = (settings_obj *)SDL_malloc (sizeof (settings_obj));
 
     s->priority   = DEFAULT_PRIORITY;
 

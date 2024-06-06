@@ -24,7 +24,7 @@ void
 start_ruler (settings_obj *settings)
 {
     /*{{{*/
-    runtime_obj *s = SDL_malloc (sizeof (runtime_obj));
+    runtime_obj *s = (runtime_obj *)SDL_malloc (sizeof (runtime_obj));
 
     s->runtime = SDL_TRUE;
 

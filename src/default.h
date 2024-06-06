@@ -1,7 +1,7 @@
 #ifndef DEFAULT_H
 #define DEFAULT_H
 #include "extern-c-helper.h"
-EXTERN_C_START()
+EXTERN_C_START
 
 #define DEFAULT_PRIORITY  SDL_LOG_PRIORITY_ERROR
 
@@ -17,6 +17,9 @@ EXTERN_C_START()
 #define DEFAULT_IMAGE     NULL
 #define DEFAULT_IMG_MODE  IMAGE_FILL
 
+/* silences some uneeded compiler warnings, at the cost of compatibility */
+/* may need to be undefined if compiler does not support it */
+#define USE_PRAGMAS
 
-EXTERN_C_END()
+EXTERN_C_END
 #endif /* DEFAULT_H */

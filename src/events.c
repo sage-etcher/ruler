@@ -3,6 +3,7 @@
 #include "SDL2/SDL.h"
 #include "tinyfd/tinyfiledialogs.h"
 
+#include "default.h"
 #include "imgmode.h"
 #include "runtime.h"
 #include "str_utils.h"
@@ -31,10 +32,10 @@ static void shortcut_inc_opacity (const void *e, void *data);
 static void shortcut_dec_opacity (const void *e, void *data);
 static void shortcut_help (const void *e, void *data);
 
-#define KMOD_ALTSHIFT (KMOD_CTRL | KMOD_ALT)
-#define KMOD_CTRLSHIFT (KMOD_CTRL | KMOD_SHIFT)
-#define KMOD_CTRLALT (KMOD_CTRL | KMOD_ALT)
-#define KMOD_CTRLALTSHIFT (KMOD_CTRL | KMOD_ALT)
+#define KMOD_ALTSHIFT     (SDL_Keymod)(KMOD_ALT  | KMOD_SHIFT)
+#define KMOD_CTRLSHIFT    (SDL_Keymod)(KMOD_CTRL | KMOD_SHIFT)
+#define KMOD_CTRLALT      (SDL_Keymod)(KMOD_CTRL | KMOD_ALT)
+#define KMOD_CTRLALTSHIFT (SDL_KeyMod)(KMOD_CTRL | KMOD_ALT | KMOD_SHIFT)
 
 void
 handle_events (runtime_obj *s)
@@ -57,7 +58,7 @@ handle_events (runtime_obj *s)
         { SDLK_F1,           (KMOD_NONE),      shortcut_help         },
         { SDLK_SLASH,        (KMOD_CTRL),      shortcut_help         },
         { SDLK_SLASH,        (KMOD_CTRLSHIFT), shortcut_help         },
-        NULL_SHORTCUT
+        { (SDL_Keycode)0,    (SDL_Keymod)0,    (kshort_callback)NULL }
     };
 
 
@@ -82,13 +83,24 @@ handle_events (runtime_obj *s)
 
 /* shortcut functions */
 /*{{{*/
+/* the shortcut callback functions are required to accept 2 parameters,
+ * 1)  const void *e  for the Event that triggered it, normally SDL_Keysym *
+ * 2)  void *data     for the data variable passed to handle_keyboard_events()
+ *
+ * both of these may be ignored or unused within the function, -Wextra will
+ * compliain that they are unused, to silence it, we use the following pragmas
+ */
+#ifdef USE_PRAGMAS
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif /* USE_PRAGMAS */
 static void
 shortcut_quit (const void *e, void *data)
 {
     /*{{{*/
-    /* quit */
-    runtime_obj *s = data;
+    runtime_obj *s = (runtime_obj *)data;
 
+    /* quit */
     s->runtime = SDL_FALSE;
     SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "runtime: %s\n", log_sdlbool (s->runtime));
 
@@ -100,9 +112,9 @@ static void
 shortcut_resize_lock (const void *e, void *data)
 {
     /*{{{*/
-    /* lock current size */
-    runtime_obj *s = data;
+    runtime_obj *s = (runtime_obj *)data;
 
+    /* lock current size */
     s->resize_flag = (s->resize_flag ? SDL_FALSE : SDL_TRUE);
     SDL_SetWindowResizable(s->win, s->resize_flag);
     SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "resize_flag: %s\n", log_sdlbool (s->resize_flag));
@@ -115,9 +127,9 @@ static void
 shortcut_cycle_mode (const void *e, void *data) 
 {
     /*{{{*/
-    /* cycle image mode */
-    runtime_obj *s = data;
+    runtime_obj *s = (runtime_obj *)data;
 
+    /* cycle image mode */
     s->bg_mode = cycle_mode (s->bg_mode);
     SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_mode: %s\n", log_imgmode (s->bg_mode));
 
@@ -129,9 +141,9 @@ static void
 shortcut_set_image (const void *e, void *data)
 {
     /*{{{*/
-    /* new background image */
-    runtime_obj *s = data;
+    runtime_obj *s = (runtime_obj *)data;
 
+    /* new background image */
     select_new_image (s);
     SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_image: %s\n", s->bg_image);
 
@@ -143,9 +155,9 @@ static void
 shortcut_toggle_image (const void *e, void *data)
 {
     /*{{{*/
-    /* toggle background image */
-    runtime_obj *s = data;
+    runtime_obj *s = (runtime_obj *)data;
 
+    /* toggle background image */
     if (s->use_bg_image == SDL_TRUE)
     {
         s->use_bg_image = SDL_FALSE;
@@ -165,9 +177,9 @@ static void
 shortcut_set_color (const void *e, void *data)
 { 
     /*{{{*/
-    /* new background color */
-    runtime_obj *s = data;
+    runtime_obj *s = (runtime_obj *)data;
 
+    /* new background color */
     select_new_color (s);
     SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "bg_color: 0x%06x\n", s->bg_color);
 
@@ -179,9 +191,9 @@ static void
 shortcut_inc_opacity (const void *e, void *data)
 {
     /*{{{*/
-    /* opacity up 10% */
-    runtime_obj *s = data;
+    runtime_obj *s = (runtime_obj *)data;
 
+    /* opacity up 10% */
     relative_move_opacity (s, 0.10f);
     SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "opacity: %.02f\n", s->opacity);
 
@@ -193,9 +205,9 @@ static void
 shortcut_dec_opacity (const void *e, void *data)
 {
     /*{{{*/
-    /* opacity up 10% */
-    runtime_obj *s = data;
+    runtime_obj *s = (runtime_obj *)data;
 
+    /* opacity up 10% */
     relative_move_opacity (s, -0.10f);
     SDL_LogDebug (SDL_LOG_CATEGORY_APPLICATION, "opacity: %.02f\n", s->opacity);
 
@@ -214,6 +226,10 @@ shortcut_help (const void *e, void *data)
     return;
     /*}}}*/
 }
+
+#ifdef USE_PRAGMAS
+#pragma GCC diagnostic pop
+#endif /* USE_PRAGMAS */
 /*}}}*/
 
 
@@ -228,7 +244,7 @@ cycle_mode (imgmode mode)
         return IMAGE_MODE_FIRST;
 
     /* all other times, move to the next item */
-    return (mode + 1);
+    return (imgmode)(mode + 1);
     /*}}}*/
 }
 

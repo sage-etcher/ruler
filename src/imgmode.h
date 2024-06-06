@@ -1,7 +1,7 @@
 #ifndef IMGMODE_H
 #define IMGMODE_H
 #include "extern-c-helper.h"
-EXTERN_C_START()
+EXTERN_C_START
 
 typedef enum 
 {
@@ -16,5 +16,5 @@ typedef enum
 } imgmode;
 
 
-EXTERN_C_END()
+EXTERN_C_END
 #endif /* IMGMODE_H */
