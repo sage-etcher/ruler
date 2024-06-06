@@ -32,6 +32,8 @@ create_window (int width, int height)
 {
     /*{{{*/
     const char *TITLE= "Ruler";
+    const int WINDOW_FLAGS = (SDL_WINDOW_BORDERLESS | SDL_WINDOW_SKIP_TASKBAR | 
+                              SDL_WINDOW_HIDDEN | SDL_WINDOW_ALLOW_HIGHDPI);
     SDL_Window *win;
 
     /* create the window */
@@ -39,7 +41,7 @@ create_window (int width, int height)
             TITLE, 
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
             width, height,
-            SDL_WINDOW_BORDERLESS | SDL_WINDOW_SKIP_TASKBAR | SDL_WINDOW_HIDDEN);
+            WINDOW_FLAGS);
 
     if (win) 
     {
