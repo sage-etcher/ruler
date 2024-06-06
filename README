@@ -17,6 +17,8 @@ Keyboard Shortcuts:
   CTRL+U    select background color
   CTRL+[    decrease opacity by -10%
   CTRL+]    increase opacity by +10%
+  SCRLDOWN  move the window down
+  SCRLUP    move the window up
   CTRL+/    print shortcut list
   F1        print shortcut list
   CTRL+Q    quit

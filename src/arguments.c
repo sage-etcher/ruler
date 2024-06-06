@@ -123,6 +123,7 @@ get_shortcuts (void)
            "  <CTRL+[>   decrease opacity by -10%\n"
            "  <CTRL+]>   increase opacity by +10%\n"
            "  <F1>       show shortcut help menu\n"
+           "  <SCROLL>   move the window\n"
            "  <CTRL+/>   show shortcut help menu\n"
            "  <CTRL+q>   quit\n"
            "  <ESC>      quit\n";
