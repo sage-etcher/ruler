@@ -1,5 +1,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
+#include "extern-c-helper.h"
+EXTERN_C_START()
 
 #include "SDL2/SDL.h"
 
@@ -24,4 +26,5 @@ typedef struct
 
 settings_obj *default_settings (void);
 
+EXTERN_C_END()
 #endif /* SETTINGS_H */

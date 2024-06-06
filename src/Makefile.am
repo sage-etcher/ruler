@@ -1,7 +1,7 @@
 
 bin_PROGRAMS = ruler
 ruler_SOURCES = main.c \
-                default.h \
+                extern-c-helper.h default.h \
                 runtime.h settings.c settings.h imgmode.h color.h \
                 str_utils.c str_utils.h \
                 arguments.c arguments.h \

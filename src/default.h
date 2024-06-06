@@ -1,5 +1,7 @@
 #ifndef DEFAULT_H
 #define DEFAULT_H
+#include "extern-c-helper.h"
+EXTERN_C_START()
 
 #define DEFAULT_PRIORITY  SDL_LOG_PRIORITY_ERROR
 
@@ -16,4 +18,5 @@
 #define DEFAULT_IMG_MODE  IMAGE_FILL
 
 
+EXTERN_C_END()
 #endif /* DEFAULT_H */

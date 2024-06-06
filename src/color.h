@@ -1,5 +1,7 @@
 #ifndef COLOR_H
 #define COLOR_H
+#include "extern-c-helper.h"
+EXTERN_C_START()
 
 /* c standard libraries */
 #include <stdint.h>
@@ -34,6 +36,7 @@ typedef uint_fast32_t color;
 #define SET_HEX_B(_v,_x) (_SET_HEX(_v,_x, HEX_B_MASK, HEX_B_OFFSET))
 
 
+EXTERN_C_END()
 #endif /* COLOR_H */
 
 /*

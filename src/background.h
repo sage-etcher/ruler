@@ -1,5 +1,7 @@
 #ifndef BACKGROUND_H
 #define BACKGROUND_H
+#include "extern-c-helper.h"
+EXTERN_C_START()
 
 #include "SDL2/SDL.h"
 
@@ -10,6 +12,7 @@ void load_image (SDL_Surface **p_surface, SDL_Texture **p_texture, SDL_Renderer 
 void draw_background_image (SDL_Renderer *rend, SDL_Texture *bg_texture, imgmode bg_image_mode, SDL_Rect tex_rect);
 SDL_bool create_background_image (char *filename, SDL_Renderer *rend, SDL_Surface **p_surf, SDL_Texture **p_tex);
 
+EXTERN_C_END()
 #endif /* BACKGROUND_H */
 
 /*

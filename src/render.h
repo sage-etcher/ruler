@@ -1,5 +1,7 @@
 #ifndef RENDER_H
 #define RENDER_H
+#include "extern-c-helper.h"
+EXTERN_C_START()
 
 #include "SDL2/SDL.h"
 
@@ -11,6 +13,7 @@ void set_render_draw_color (SDL_Renderer *rend, color hex_color);
 void clear_renderer (SDL_Renderer *rend);
 void render_copy (SDL_Renderer *renderer, SDL_Texture *texture, SDL_Rect *srcrect, SDL_Rect *dstrect);
 
+EXTERN_C_END()
 #endif /* RENDER_H */
 
 /*
