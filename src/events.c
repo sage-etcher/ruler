@@ -21,6 +21,7 @@ static void select_new_image (runtime_obj *s);
 static void select_new_color (runtime_obj *s);
 static void relative_move_opacity (runtime_obj *s, float relative_move);
 static void runtime_shortcuts_prompt (void);
+static void scroll_window (runtime_obj *s, SDL_MouseWheelEvent *wheel);
 
 static void shortcut_quit (const void *e, void *data);
 static void shortcut_resize_lock (const void *e, void *data);
@@ -68,6 +69,10 @@ handle_events (runtime_obj *s)
         {
         case SDL_KEYDOWN:
             (void)handle_keyboard_shortcuts (s, control_shortcuts, &e.key.keysym);
+            break;
+
+        case SDL_MOUSEWHEEL:
+            (void)scroll_window (s, &e.wheel);
             break;
 
         case SDL_QUIT:
@@ -382,6 +387,36 @@ runtime_shortcuts_prompt (void)
     /*}}}*/
 }
 
+
+static void
+scroll_window (runtime_obj *s, SDL_MouseWheelEvent *wheel)
+{
+    const int MOVE_TICK = 5;   /* how far (in pixels) does 1 scroll tick move the window? */
+
+    int window_x,   window_y;
+    int relative_x, relative_y;
+    int absolute_x, absolute_y;
+
+    /* guard */
+    if ((wheel == NULL) ||
+        (s == NULL) ||
+        (s->win == NULL))
+    {
+        return;
+    }
+
+    relative_x = -wheel->x; /* flip the direction */
+    relative_y = -wheel->y; 
+
+    SDL_GetWindowPosition (s->win, &window_x, &window_y);
+
+    absolute_x = window_x + (relative_x * MOVE_TICK);
+    absolute_y = window_y + (relative_y * MOVE_TICK);
+
+    SDL_SetWindowPosition (s->win, absolute_x, absolute_y);
+
+    return;
+}
 
 /*
 vim: ts=4 sts=4 sw=4 et fdm=marker
