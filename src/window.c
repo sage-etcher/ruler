@@ -19,7 +19,7 @@ if (_c) { \
         closest_dist = dist; \
         closest_result = _r; \
     } \
-} \
+}
 /*}}}*/
 
 
